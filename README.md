@@ -1,4 +1,5 @@
 # Contest (Under Construction)
+#### Make "submissions" folder inside routes directory
 #### cd to folder directory
 #### Install node modules (use npm install for windows)
 #### Write npm test
