@@ -1,0 +1,19 @@
+<div>
+  <h3>Logo and Name</h3>
+  <nav>
+    
+      {{#if isAuthenticated}}
+        <h5>{{username}}</h5>
+        <a href="/">Home</a><br />
+        <a href="/users/dashboard">Dashboard</a><br />
+        <a href="/users/logout">Logout</a><br />
+
+      {{else}}
+        <a href="/">Home</a><br />
+        <a href="/users/register">Sign Up</a><br />
+        <a href="/users/login">Sign In</a><br />
+      {{/if}}
+      
+    
+  </nav>
+</div>

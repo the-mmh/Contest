@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body{
+        overflow-y: scroll;
+      }
+    </style>
+    <title>Logo and name</title>
+
+    {{!-- <link rel="stylesheet" href="/ace/demo/kitchen-sink/styles.css" type="text/css" media="screen" charset="utf-8">
+    
+    <script async="true" src="https://use.edgefonts.net/source-code-pro.js"></script> --}}
+
+    
+    
+
+    <link rel="stylesheet" 
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" 
+          crossorigin="anonymous">
+    <link rel="stylesheet" 
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" 
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" 
+          crossorigin="anonymous">
+    <link rel="stylesheet" 
+          href="/css/style.css">
+  </head>
+  <body>
+    {{#if success_messages }}
+      <div class="alert alert-success">{{success_messages}}</div>
+    {{/if}}
+    {{#if error_messages }}
+      <div class="alert alert-danger">{{error_messages}}</div>
+    {{/if}}
+    
+    <div class="container">
+      {{> navbar}}
+
+      {{{body}}}
+      
+    </div>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" 
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" 
+            crossorigin="anonymous"></script>
+    
+    {{!-- <script src="/ace/src/ace.js" data-ace-base="src" type="text/javascript" charset="utf-8"></script>
+    <script src="/ace/src/keybinding-vim.js"></script>
+    <script src="/ace/src/keybinding-emacs.js"></script>
+    <script src="/ace/demo/kitchen-sink/demo.js"></script>
+    <script type="text/javascript" charset="utf-8">
+      require("/ace/kitchen-sink/demo");
+    </script> --}}
+  </body>
+</html>

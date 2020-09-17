@@ -1,0 +1,36 @@
+<h3>Running Contests</h3>
+{{#if CRName.length}}
+    {{#each CRName}}
+        <form action="/contests" method="POST">
+            <input type="submit" name = "{{this}}" value = "{{this}}"><br /><br />
+        </form>
+    {{/each}}
+{{else}}
+    No Contests
+{{/if}}
+
+<br />
+<h3>Upcoming Contests</h3>
+{{#if CUName.length}}
+    
+    {{#each CUName}}
+        <form action="/contests" method="POST">
+            <input type="submit" name = "{{this}}" value = "{{this}}"><br /><br />
+        </form>
+    {{/each}}
+{{else}}
+    No Contests
+{{/if}}
+
+<br />
+
+<h3>Past Contests</h3>
+{{#if CEName.length}}
+    {{#each CEName}}
+        <form action="/contests" method="POST">
+            <input type="submit" name = "{{this}}" value = "{{this}}"><br /><br />
+        </form>
+    {{/each}}
+{{else}}
+    No Contests
+{{/if}}
