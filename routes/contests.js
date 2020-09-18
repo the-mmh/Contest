@@ -597,16 +597,28 @@ router.route('/usersubmission/:s_id')
 
 
         var code, codea = [];
-        await Submission.findOne({ 's_id': s_id }, 'language who when which verdict time memory', (err, res) => {
+        await Submission.findOne({ 's_id': s_id }, 'language ccode who when which verdict time memory', (err, res) => {
             if (err) throw err;
             userdata = res;
-
-            code = fs.readFileSync(__dirname + '/submissions/' + s_id + '.cpp', 'utf-8').toString();
-
         });
-        console.log(code);
 
-        if (req.user.username === userdata.who) {
+        await Contest.find({ 'code': userdata.ccode }, 'date duration', (err, due) => {
+            if (err) throw err;
+            if (due) {
+                allcontest = due;
+            }
+        });
+
+
+        var now = Date.now(),
+            date = allcontest.date,
+            dur = allcontest.duration;
+
+
+        if (req.user.username === userdata.who || (date + dur * 60 * 60 * 1000) < now) {
+            code = fs.readFileSync(__dirname + '/submissions/' + s_id + '.cpp', 'utf-8').toString();
+            console.log(code);
+
             res.render('usersubmission', {
                 code: code,
                 who: userdata.who,
@@ -619,7 +631,7 @@ router.route('/usersubmission/:s_id')
             })
         } else {
             res.render('usersubmission', {
-                code: "Beta itna dimag code likhne me laga",
+                code: "Access Denied",
                 who: "NaN",
                 which: "NaN",
                 language: "NaN",
@@ -683,9 +695,6 @@ router.route('/ranklist/:code')
             else if (a[2] > b[2]) return -1;
         });
 
-
-
-
         for (let i = 0; i < scores.length; i++) {
             show[scores[i][2]] = contest[scores[i][2]];
             show[scores[i][2]]["problem"] = {};
@@ -706,13 +715,13 @@ router.route('/ranklist/:code')
                 }
 
             })
-            console.log(pcodes);
-            console.log(pC);
 
             show[scores[i][2]]["problem"] = pcodes;
+            show[scores[i][2]]["rank"] = i + 1;
 
         }
     }
+
     console.log(show);
     res.render('ranklist', {
         pC: pC,
