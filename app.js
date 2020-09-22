@@ -28,7 +28,9 @@ mongoose.set('useUnifiedTopology', true);
 mongoose.set('useFindAndModify', false);
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/logsn', () => console.log("App Db success"))
+
+const uri = "mongodb+srv://piyushg9794:passwordnahi@123@contest.j9ls1.mongodb.net/logsn";
+mongoose.connect(uri, () => console.log("App Db success"))
     .catch(err => console.log(err));
 
 
