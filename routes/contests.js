@@ -11,7 +11,6 @@ const notifier = require('node-notifier');
 const { c, cpp, node, python, java } = require('compile-run');
 var fs = require('fs');
 const qrate = require('qrate');
-const { stderr } = require('process');
 const { all } = require('./users');
 
 
