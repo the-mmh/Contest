@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const expressHandlebars = require('express-handlebars');
 const flash = require('connect-flash');
 const session = require('express-session');
-
+const fs = require('fs');
 const app = express();
 const router = express.Router();
 const mongoose = require('mongoose');
@@ -83,7 +83,7 @@ app.use((req, res, next) => {
 app.use('/', require('./routes/index'));
 app.use('/users', require('./routes/users'));
 app.use('/contests', require('./routes/contests'));
-
+app.use('/admin', require('./routes/admin'));
 
 
 

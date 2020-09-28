@@ -1,0 +1,25 @@
+<form action="/admin/addcontest" method="POST">
+    
+    <label for="Name">Contest Name</label>
+    <input type="text" id="name" name="name" />
+    <br/>
+    <label for="code">Contest Code</label>
+    <input type="text" id="code" name="code" />
+    <br/>
+    <label for="date">Contest Date</label>
+    <input type="datetime-local" id="date" name="date" />
+    <br/>
+    <label for="duration">Contest Duration</label>
+    <input type="number" id="duration" name="duration" />
+    <br/>
+    <label for="problems">Enter ',' seperated problem codes</label>
+    <input type="text" id="problems" name="problems" /> (e.g. = Code1,Code2,Code3.........)
+    <br/>
+    
+    <input type = "submit" name = "submit" value = "Submit"/>
+</form>
+
+<br />
+Click <a href="/admin/allprob">here</a> to see not asked questions in database.
+
+

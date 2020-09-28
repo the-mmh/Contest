@@ -14,6 +14,7 @@ const qrate = require('qrate');
 
 
 
+
 const worker = async(pushed, done) => {
 
     var contestSchema = pushed["contestSchema"];
@@ -59,7 +60,7 @@ const worker = async(pushed, done) => {
         });
 
         const path = __dirname + "/routes/submissions/" + sub.s_id + ".cpp";
-        console.log(input, output, path);
+        // console.log(input, output, path);
         Submission.updateOne({ "s_id": sub.s_id }, { $set: { "verdict": "Running on test case-" + (i + 1).toString() } }, (err, res) => {
             if (err) throw err;
         })
@@ -98,7 +99,7 @@ const worker = async(pushed, done) => {
             }
         })
 
-        console.log("useroutput --- ", useroutput);
+        // console.log("useroutput --- ", useroutput);
 
         if (useroutput.toString().trim() !== output || flag === 0) {
             flag = 0;
@@ -135,9 +136,9 @@ const worker = async(pushed, done) => {
             score[sub.who]["penalty"] = 0;
         }
         score[sub.who]["penalty"] = Math.floor((sub.when.getTime() - contestSchema.date.getTime()) / (1000 * 60) + (5 * ((score[sub.who][sub.which]["p"] === undefined) ? 0 : score[sub.who][sub.which]["p"])));
-        console.log(score[sub.who]["penalty"]);
+        // console.log(score[sub.who]["penalty"]);
         score[sub.who]["score"] += score[sub.who][sub.which]["score"];
-        console.log(score[sub.who]["penalty"], score[sub.who]["score"]);
+        // console.log(score[sub.who]["penalty"], score[sub.who]["score"]);
 
         verdi = "Accepted";
     }
@@ -150,7 +151,7 @@ const worker = async(pushed, done) => {
         }
     }, (err, res) => {
         if (err) throw err;
-        console.log("Done");
+        // console.log("Done");
     })
 
 
@@ -162,7 +163,7 @@ const worker = async(pushed, done) => {
         console.log("Done");
     })
 
-    setTimeout(done, 0);
+    setTimeout(done, Number(sub.tl) * 1000);
 }
 
 const q = qrate(worker);

@@ -14,6 +14,10 @@ const qrate = require('qrate');
 const { stderr } = require('process');
 const { all } = require('./users');
 const q = require('../judge');
+const { google } = require('googleapis');
+const drive = google.drive('v3');
+const stream = require('stream');
+const cred = require('../config/cred');
 
 
 var app = express();
@@ -28,6 +32,8 @@ var allcontest = {};
 contestSchema.score = {};
 
 let probs = {};
+
+
 
 router.route('/')
     .get(async(req, res) => {
@@ -108,12 +114,12 @@ router.route('/quespage')
             date = res.date.getTime();
             dur = res.duration;
             for (let i = 0; i < res.problems.length; i++) {
-                pC.push(res.problems[i].probCode);
+                pC.push(res.problems[i]);
             }
         })
 
         var now = Date.now();
-
+        console.log("pc -- ", pC);
         if (now >= date && (date + (dur * 60 * 60 * 1000)) >= now) {
             res.render('quespage', {
                 CName: contestSchema.name,
@@ -253,6 +259,10 @@ router.route('/submit/:probCode')
             fs.writeFileSync(__dirname + '/submissions/' + sub.s_id + ".cpp", sub.code, 'utf8', (err) => {
                 if (err) throw err;
             })
+
+            let bufst = new stream.PassThrough();
+
+
 
             var lang = sub.language;
             var command;
@@ -500,12 +510,8 @@ router.route('/ranklist/:code')
         pC = [];
 
     await Contest.find({ 'code': code }, (err, res) => {
-        var ar = res[0].problems;
+        pC = res[0].problems;
 
-        Object.keys(ar).forEach(k => {
-
-            pC.push(ar[k]["probCode"]);
-        })
 
         if (res[0].score) {
             contest = res[0].score;
@@ -566,7 +572,7 @@ router.route('/ranklist/:code')
         }
     }
 
-    console.log(show);
+
     res.render('ranklist', {
         pC: pC,
         data: show,
