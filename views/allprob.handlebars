@@ -1,0 +1,27 @@
+<br />
+
+<table border = "1px solid #000">
+    <tr>
+        <th>Problem Code</th>
+        <th>Problem Setter</th>
+        <th>Problem Tester</th>
+        <th>Problem Score</th>
+        <th>Problem Time limit</th>
+        <th>Problem Memory limit</th>
+        <th>Date Added</th>
+        <th>Statement</th>
+    </tr>
+    
+    {{#each obj as |a|}}
+        <tr>
+            <td>{{this.[0]}}</td>
+            <td>{{this.[1]}}</td>
+            <td>{{this.[2]}}</td>
+            <td>{{this.[3]}}</td>
+            <td>{{this.[4]}}</td>
+            <td>{{this.[5]}}</td>
+            <td>{{this.[6]}}</td>
+            <td><a href="/admin/allprob/{{probCode}}">Click</a></td>
+        </tr>
+    {{/each}}
+</table>

@@ -9,8 +9,6 @@ const question = new schema({
     probSetter: String,
     probTester: String,
     statement: String,
-    input: String,
-    output: String,
     score: Number,
     tl: { // Time Limit in sec
         type: Number,
@@ -21,6 +19,7 @@ const question = new schema({
         min: 0,
     },
     numofinputfiles: Number,
+    numofexfiles: Number,
     asked: Boolean,
     dateAdded: String,
 });

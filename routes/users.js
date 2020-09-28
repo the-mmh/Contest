@@ -14,6 +14,7 @@ const userschema = joi.object().keys({
     email: joi.string().email().required(),
     username: joi.string().required(),
     password: joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required(),
+    role: joi.string().required(),
     confirmationPassword: joi.any().valid(joi.ref('password')).required(),
     contact: joi.string().required()
 
@@ -57,7 +58,9 @@ router.route('/register')
                 return;
             }
 
-            const user = await User.findOne({ 'email': result.value.email });
+            const user = await User.findOne({ 'email': result.value.email }, (err, res) => {
+                if (err) throw err;
+            });
             if (user) {
 
                 req.flash('error', 'email already exist!');
@@ -79,9 +82,6 @@ router.route('/register')
             const secretToken = randomstring.generate()
             result.value.secretToken = secretToken;
             result.value.active = false;
-            // console.log('result: ', result);
-
-
 
             delete result.value.confirmationPassword;
             result.value.password = hash;
@@ -91,7 +91,13 @@ router.route('/register')
             //console.log('newuser - ', newuser)
             await newuser.save();
             req.flash('success', 'successfully registered');
-            res.redirect('/users/verify');
+
+            if (result.value.role === "admin") {
+                res.redirect('/users/adminverify');
+                return;
+            } else {
+                res.redirect('/users/verify');
+            }
 
         } catch (error) {
             next(error);
@@ -110,14 +116,18 @@ router.route('/login')
         failureRedirect: '/users/login',
         failureFlash: true
     }));
-
+admin = false;
 router.route('/dashboard')
     .get(isAuthenticated, (req, res) => {
 
 
-        res.render('dashboard', {
-            username: req.user.username
+        if (req.user.role === "admin") {
+            admin = true;
+        }
 
+        res.render('dashboard', {
+            username: req.user.username,
+            admin: admin
         });
     });
 
@@ -151,6 +161,32 @@ router.route('/verify')
     });
 
 
+router.route('/adminverify')
+    .get(isNotAuthenticated, (req, res) => {
+        res.render('adminverify');
+    })
+    .post(async(req, res, next) => {
+        try {
+
+            const { adminToken } = req.body;
+
+            if (adminToken === "adminToken") {
+                req.flash('success', 'Admin User Verified!');
+                res.redirect('/users/verify');
+            } else {
+                req.flash('error', 'Wrong Admin Code');
+                res.redirect('/users/adminverify');
+            }
+
+
+
+        } catch (error) {
+            next(error);
+        }
+
+    });
+
+
 
 router.route('/logout')
     .get((req, res) => {
@@ -161,4 +197,4 @@ router.route('/logout')
 
 
 
-module.exports = router, isAuthenticated, isNotAuthenticated, cUser;
+module.exports = router, isAuthenticated, isNotAuthenticated, admin;

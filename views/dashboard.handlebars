@@ -1,6 +1,9 @@
 
 <div>  
   <h1>Welcome {{username}}</h1>
+  {{#if admin}}
+    <a href="/admin">Admin Page</a>
+  {{/if}}
   <a href = "/contests/submissions/1">Submissions</a>
   
 </div>
