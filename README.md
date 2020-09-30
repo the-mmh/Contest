@@ -1,4 +1,4 @@
-# Contest (Under Construction)
+# Contest Managament System (Under Construction)
 #### Make "submissions" folder inside routes directory
 #### cd to folder directory
 #### Install node modules (use npm install for windows)
