@@ -1,27 +1,36 @@
+<style>
+    .tab tr th, .tab tr td{
+        padding:8px;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .heading{
+        color: #337ab7;
+        background: rgba(0, 0, 0, 0);
+        border:none;
+    }
+
+    
+</style>
+
 <br />
 
-<table border = "1px solid #000">
+<table class="tab" border = "1px solid #000">
     <tr>
-        <th>Problem Code</th>
-        <th>Problem Setter</th>
-        <th>Problem Tester</th>
-        <th>Problem Score</th>
-        <th>Problem Time limit</th>
-        <th>Problem Memory limit</th>
-        <th>Date Added</th>
-        <th>Statement</th>
+        <form id="allprob" method="POST" action="/admin/allprob">
+            <th><button class="heading" type = "submit" value="probCode" name="sort">Problem Code</button></th>
+            <th><button class="heading" type = "submit" value="score" name="sort">Score</button></th>
+        </form>
+
+        <th>Details</th>
     </tr>
     
-    {{#each obj as |a|}}
+    {{#each obj}}
         <tr>
-            <td>{{this.[0]}}</td>
-            <td>{{this.[1]}}</td>
-            <td>{{this.[2]}}</td>
-            <td>{{this.[3]}}</td>
-            <td>{{this.[4]}}</td>
-            <td>{{this.[5]}}</td>
-            <td>{{this.[6]}}</td>
-            <td><a href="/admin/allprob/{{probCode}}">Click</a></td>
+            <td>{{probCode}}</td>
+            <td>{{score}}</td>
+            <td><a href="/admin/statement/{{this.probCode}}">Click</a></td>
         </tr>
     {{/each}}
 </table>

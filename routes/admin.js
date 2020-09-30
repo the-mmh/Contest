@@ -1,21 +1,27 @@
 const express = require('express');
 const router = express.Router();
-const cookieParser = require('cookie-parser');
+
 const bodyParser = require('body-parser');
-const User = require('../models/user');
+
 const Ques = require('../models/ques');
-const Submission = require('../models/submission');
 const Contest = require('../models/contest');
 
-app = express();
+const fs = require('fs');
+const url = require('url');
+var app = express();
+app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
 
 
 
 router.route('/')
     .get(async(req, res) => {
+        if (req.user === undefined) {
+            req.flash('error', 'you must be registered and admin');
+            res.redirect('/users/login');
+            return;
+        }
         res.render('admin');
     })
 
@@ -49,6 +55,7 @@ router.route('/addquestion')
 
         if (f) {
             res.redirect('/admin/addquestion');
+            return;
         }
         var arr = Object.keys(data);
         for (var i = 0; i < arr.length; i++) {
@@ -61,6 +68,7 @@ router.route('/addquestion')
         }
         if (f) {
             res.redirect('/admin/addquestion');
+            return;
         }
 
         console.log("data -- ", data);
@@ -82,11 +90,13 @@ router.route('/addquestion')
 
 router.route('/addcontest')
     .get(async(req, res) => {
+
         if (req.user === undefined) {
             req.flash('error', 'you must be registered and admin');
             res.redirect('/users/login');
             return;
         }
+
         res.render('addcontest');
     })
     .post(async(req, res) => {
@@ -205,37 +215,109 @@ router.route('/addcontest')
         res.redirect('/admin');
     });
 
+var f1 = -1,
+    f2 = -1,
+    f = 1,
+    qd = "score";
 
 router.route('/allprob')
-    .get(async(req, res) => {
-        if (req.user === undefined) {
-            req.flash('error', 'you must be registered and admin');
-            res.redirect('/users/login');
-            return;
-        }
-        var all = [];
-        await Ques.find({ 'asked': false }, "probCode probSetter probTester score tl ml dateAdded", (err, res) => {
-            if (err) throw err;
-            all = res;
 
-        })
-        var obj = [];
-        for (var i = 0; i < all.length; i++) {
-            var d = all[i];
-            var a = [];
-            a.push(d['probCode']);
-            a.push(d['probSetter']);
-            a.push(d['probTester']);
-            a.push(d['score']);
-            a.push(d['tl']);
-            a.push(d['ml']);
-            a.push(d['dateAdded']);
-            obj.push(a);
+.get(async(req, res) => {
+        try {
+
+            if (req.user === undefined) {
+                req.flash('error', 'you must be registered and admin');
+                res.redirect('/users/login');
+                return;
+            }
+
+            var q = url.parse(req.url, true).query;
+
+            if (q != null) {
+                qd = (await JSON.parse(JSON.stringify(q)))["sortby"];
+            }
+
+            var all = [],
+                ch = null;
+
+            await Ques.find({ 'asked': false }, "probCode score", async(err, res) => {
+                if (err) throw err;
+                all = await JSON.parse(JSON.stringify(res));
+            })
+
+            all.sort((a, b) => {
+                var x = a[qd],
+                    y = b[qd];
+
+                if (x > y) return f;
+                else if (x < y) return -f;
+
+            })
+
+            res.render('allprob', {
+                obj: all
+            });
+        } catch (error) {
+            req.flash('error', 'Some error ocurred');
+            res.redirect('/admin');
         }
-        res.render('allprob', {
-            obj: obj,
-            all: all
-        });
+    })
+    .post(async(req, res) => {
+        var data = JSON.parse(JSON.stringify(req.body));
+        var key = data["sort"];
+        if (key === "score") {
+            f1 *= -1;
+            f = f1;
+        } else {
+            f2 *= -1;
+            f = f2;
+        }
+        console.log(key, f);
+        res.redirect(`/admin/allprob?sortby=${key}`);
+
+    })
+
+
+
+router.route('/statement/:code')
+    .get(async(req, res) => {
+        try {
+            if (req.user === undefined) {
+                req.flash('error', 'you must be registered and admin');
+                res.redirect('/users/login');
+                return;
+            }
+            var code = req.params.code,
+                path = __dirname + "/" + code + "/" + code;
+
+            var statement = fs.readFileSync(path + "s.txt", 'utf-8');
+            var input = fs.readFileSync(path + "i.txt", 'utf-8');
+            var output = fs.readFileSync(path + "o.txt", 'utf-8');
+
+
+            var all = [];
+            await Ques.findOne({ 'probCode': code }, "probCode score probSetter probTester tl ml dateAdded", (err, res) => {
+                if (err) throw err;
+                all = res;
+
+            })
+
+            res.render('statement', {
+                statement: statement,
+                code: code,
+                input: input,
+                output: output,
+                tester: all.probTester,
+                setter: all.probSetter,
+                tl: all.tl,
+                ml: all.ml,
+                date: all.dateAdded
+            })
+        } catch (error) {
+            req.flash('error', 'Some error ocurred');
+            res.redirect('/admin');
+        }
+
     })
 
 

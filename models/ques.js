@@ -21,7 +21,7 @@ const question = new schema({
     numofinputfiles: Number,
     numofexfiles: Number,
     asked: Boolean,
-    dateAdded: String,
+    dateAdded: Date,
 });
 
 const Ques = mongoose.model('ques', question);

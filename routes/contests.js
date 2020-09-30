@@ -8,17 +8,12 @@ const Contest = require('../models/contest');
 const { exec } = require("child_process");
 const isAuthenticated = require('./users');
 const notifier = require('node-notifier');
-const { c, cpp, node, python, java } = require('compile-run');
-var fs = require('fs');
-const qrate = require('qrate');
-const { stderr } = require('process');
-const { all } = require('./users');
+
 const amqp = require('../services/sendamqp');
 const amqprec = require('../services/recieveamqp');
-const { google } = require('googleapis');
-const drive = google.drive('v3');
+
 const stream = require('stream');
-const cred = require('../config/cred');
+
 var azure = require('../services/connectazure');
 
 
@@ -38,6 +33,16 @@ let probs = {};
 
 
 router.route('/')
+    .post(async(req, res) => {
+        var obj = req.body;
+
+        var contestname = Object.keys(obj)[0];
+        await Contest.find({ 'name': contestname }, (err, res) => {
+
+            contestSchema = res[0];
+        })
+        res.redirect('/contests/quespage');
+    })
     .get(async(req, res) => {
 
         await Contest.find({ 'done': false }, 'name code problems date duration done', (err, due) => {
@@ -90,34 +95,29 @@ router.route('/')
             CUCode: cucode,
             CUDate: cudate,
         });
-    })
+    });
 
-.post((req, res) => {
-    var obj = req.body;
 
-    var contestname = Object.keys(obj)[0];
-    Contest.find({ 'name': contestname }, (err, res) => {
 
-        contestSchema = res[0];
-    })
-    res.redirect('/contests/quespage');
-})
-
-var probAccCode = probs;
 
 router.route('/quespage')
 
-.get(async(req, res) => {
+.get(async(req, res, next) => {
+    try {
         var date;
         var dur = contestSchema.duration;
-        var pC = [];
-        await Contest.findOne({ 'code': contestSchema.code }, 'date duration problems', (err, res) => {
+        var pC = [],
+            ccode = contestSchema.code;
+
+        await Contest.findOne({ 'code': ccode }, 'date duration problems', (err, res) => {
             if (err) throw err;
+
             date = res.date.getTime();
             dur = res.duration;
             for (let i = 0; i < res.problems.length; i++) {
                 pC.push(res.problems[i]);
             }
+
         })
 
         var now = Date.now();
@@ -148,18 +148,12 @@ router.route('/quespage')
                 CStatus: "Contest is not yet started",
             });
         }
-    })
-    // .post(async(req, res, next) => {
-    //     try {
-    //         var url = req.body;
+    } catch (error) {
+        req.flash('error', 'Some error occurred');
+        res.redirect('/contests');
+    }
+})
 
-//         var que = Object.keys(url)[0];
-
-//         res.redirect('/contests/ranklist' + que);
-//     } catch (error) {
-//         next(error);
-//     }
-// });
 
 router.route('/quespage/prob/:probCode')
 
@@ -175,7 +169,7 @@ router.route('/quespage/prob/:probCode')
     const shareName = "questions";
     const fileName = code + '/' + code;
 
-    
+
     final1.statement = `${(await azure.azurefilesread(shareName, fileName+ "s.txt")).toString()}`;
     final1.input = `${(await azure.azurefilesread(shareName, fileName+ "i.txt")).toString()}`;
     final1.output = `${(await azure.azurefilesread(shareName, fileName+ "o.txt")).toString()}`;
@@ -274,7 +268,7 @@ router.route('/submit/:probCode')
             }
 
             //Done: ToDo: update compile command to be compatible with azure
-            
+
             await azure.azuresubmissionread('submissions', sub.s_id + ".cpp", __dirname + "/submissions/" + sub.s_id + ".cpp")
             compilecommand = command + " " + __dirname + "/submissions/" + sub.s_id + ".cpp";
             console.log(compilecommand);
@@ -295,6 +289,7 @@ router.route('/submit/:probCode')
                     var topush = sub.s_id;
 
                     amqp.sendamqp(topush);
+
                     amqprec.recieveamqp();
                     console.log("Queued");
                 }
@@ -308,150 +303,161 @@ router.route('/submit/:probCode')
             req.flash('error', "Contest is ended");
 
         } else {
-            res.redirect("/contests/quespage");
             req.flash('error', "Contest is not yet started");
+            res.redirect("/contests/quespage");
+
         }
 
     } catch (error) {
-        next(error);
+        req.flash('error', "Sorry, Some error ocurred");
+        res.redirect("/contests");
     }
 
 });
 
 router.route('/submissions/:page')
     .get(isAuthenticated, async(req, res) => {
+        try {
+            var subs = [];
+            if (contestSchema.code === undefined) {
+                await Submission.find({ 'who': req.user.username }, 's_id who when which verdict time memory', (err, res) => {
+                    if (err) throw err;
 
-        var subs = [];
-        if (contestSchema.code === undefined) {
-            await Submission.find({ 'who': req.user.username }, 's_id who when which verdict time memory', (err, res) => {
-                if (err) throw err;
+                    var temp = {};
 
-                var temp = {};
+                    for (let i = res.length - 1; i >= 0; i--) {
+                        var obj = [];
+                        obj.push(res[i].s_id);
+                        obj.push(res[i].who);
+                        obj.push(res[i].which);
+                        obj.push(res[i].when);
 
-                for (let i = res.length - 1; i >= 0; i--) {
-                    var obj = [];
-                    obj.push(res[i].s_id);
-                    obj.push(res[i].who);
-                    obj.push(res[i].which);
-                    obj.push(res[i].when);
-
-                    obj.push(res[i].verdict);
-                    obj.push(res[i].time);
-                    obj.push(res[i].memory);
-                    temp[res[i].when] = obj;
-                }
-                var temp1 = Object.keys(temp);
-
-
-                for (let i = 0; i < temp1.length; i++) {
-                    subs.push(temp[temp1[i]]);
-                }
-
-            });
-        } else {
-            await Submission.find({ 'who': req.user.username, 'ccode': contestSchema.code }, 's_id who when which verdict time memory', (err, res) => {
-                if (err) throw err;
-
-                var temp = {};
-
-                for (let i = res.length - 1; i >= 0; i--) {
-                    var obj = [];
-                    obj.push(res[i].s_id);
-                    obj.push(res[i].who);
-                    obj.push(res[i].which);
-                    obj.push(res[i].when);
-
-                    obj.push(res[i].verdict);
-                    obj.push(res[i].time);
-                    obj.push(res[i].memory);
-                    temp[res[i].when] = obj;
-                }
-                var temp1 = Object.keys(temp);
+                        obj.push(res[i].verdict);
+                        obj.push(res[i].time);
+                        obj.push(res[i].memory);
+                        temp[res[i].when] = obj;
+                    }
+                    var temp1 = Object.keys(temp);
 
 
-                for (let i = 0; i < temp1.length; i++) {
-                    subs.push(temp[temp1[i]]);
-                }
+                    for (let i = 0; i < temp1.length; i++) {
+                        subs.push(temp[temp1[i]]);
+                    }
 
-            });
+                });
+            } else {
+                await Submission.find({ 'who': req.user.username, 'ccode': contestSchema.code }, 's_id who when which verdict time memory', (err, res) => {
+                    if (err) throw err;
+
+                    var temp = {};
+
+                    for (let i = res.length - 1; i >= 0; i--) {
+                        var obj = [];
+                        obj.push(res[i].s_id);
+                        obj.push(res[i].who);
+                        obj.push(res[i].which);
+                        obj.push(res[i].when);
+
+                        obj.push(res[i].verdict);
+                        obj.push(res[i].time);
+                        obj.push(res[i].memory);
+                        temp[res[i].when] = obj;
+                    }
+                    var temp1 = Object.keys(temp);
+
+
+                    for (let i = 0; i < temp1.length; i++) {
+                        subs.push(temp[temp1[i]]);
+                    }
+
+                });
+            }
+
+
+            var page = Number(req.params.page) || 1;
+            var numofsubspage = 5;
+
+            var last = Math.ceil(subs.length / (numofsubspage));
+            var prev = Math.max(page - 1, 1);
+            var next = Math.min(page + 1, last);
+
+            var f = 1;
+            var i1, i2;
+            i1 = (Math.max((page - 1), 0) * (numofsubspage));
+            i2 = i1 + numofsubspage;
+
+            res.render('submissions', {
+                subs: subs.slice(i1, i2),
+                prev: prev,
+                next: next,
+                first: f,
+                last: last,
+                page: page,
+                nos: numofsubspage,
+            })
+        } catch (error) {
+            req.flash('error', "Sorry, Some error ocurred");
+            res.redirect("/contests");
         }
-
-
-        var page = Number(req.params.page) || 1;
-        var numofsubspage = 5;
-
-        var last = Math.ceil(subs.length / (numofsubspage));
-        var prev = Math.max(page - 1, 1);
-        var next = Math.min(page + 1, last);
-
-        var f = 1;
-        var i1, i2;
-        i1 = (Math.max((page - 1), 0) * (numofsubspage));
-        i2 = i1 + numofsubspage;
-
-        res.render('submissions', {
-            subs: subs.slice(i1, i2),
-            prev: prev,
-            next: next,
-            first: f,
-            last: last,
-            page: page,
-            nos: numofsubspage,
-        })
 
     });
 
 
 router.route('/status/:page')
     .get(isAuthenticated, async(req, res) => {
-        var subs = [];
-        await Submission.find({}, 's_id who when which verdict time memory', (err, res) => {
-            if (err) throw err;
+        try {
+            var subs = [];
+            await Submission.find({}, 's_id who when which verdict time memory', (err, res) => {
+                if (err) throw err;
 
-            var temp = {};
+                var temp = {};
 
-            for (let i = res.length - 1; i >= 0; i--) {
-                var obj = [];
-                obj.push(res[i].s_id);
-                obj.push(res[i].who);
-                obj.push(res[i].which);
-                obj.push(res[i].when);
+                for (let i = res.length - 1; i >= 0; i--) {
+                    var obj = [];
+                    obj.push(res[i].s_id);
+                    obj.push(res[i].who);
+                    obj.push(res[i].which);
+                    obj.push(res[i].when);
 
-                obj.push(res[i].verdict);
-                obj.push(res[i].time);
-                obj.push(res[i].memory);
-                temp[res[i].when] = obj;
-            }
-            var temp1 = Object.keys(temp);
+                    obj.push(res[i].verdict);
+                    obj.push(res[i].time);
+                    obj.push(res[i].memory);
+                    temp[res[i].when] = obj;
+                }
+                var temp1 = Object.keys(temp);
 
-            for (let i = 0; i < temp1.length; i++) {
+                for (let i = 0; i < temp1.length; i++) {
 
-                subs.push(temp[temp1[i]]);
-            }
-        });
+                    subs.push(temp[temp1[i]]);
+                }
+            });
 
 
-        var page = Number(req.params.page) || 1;
-        var numofsubspage = 5;
+            var page = Number(req.params.page) || 1;
+            var numofsubspage = 5;
 
-        var last = Math.ceil(subs.length / (numofsubspage));
-        var prev = Math.max(page - 1, 1);
-        var next = Math.min(page + 1, last);
+            var last = Math.ceil(subs.length / (numofsubspage));
+            var prev = Math.max(page - 1, 1);
+            var next = Math.min(page + 1, last);
 
-        var f = 1;
-        var i1, i2;
-        i1 = (Math.max((page - 1), 0) * (numofsubspage));
-        i2 = i1 + numofsubspage;
+            var f = 1;
+            var i1, i2;
+            i1 = (Math.max((page - 1), 0) * (numofsubspage));
+            i2 = i1 + numofsubspage;
 
-        res.render('status', {
-            subs: subs.slice(i1, i2),
-            prev: prev,
-            next: next,
-            first: f,
-            last: last,
-            page: page,
-            nos: numofsubspage,
-        })
+            res.render('status', {
+                subs: subs.slice(i1, i2),
+                prev: prev,
+                next: next,
+                first: f,
+                last: last,
+                page: page,
+                nos: numofsubspage,
+            })
+        } catch (error) {
+            req.flash('error', "Sorry, Some error ocurred");
+            res.redirect("/contests");
+        }
     });
 
 
@@ -531,6 +537,7 @@ router.route('/ranklist/:code')
             if (req.isAuthenticated()) {
                 if (contest[req.user.username] !== undefined) {
                     currentuser.push(req.user.username);
+
                     currentuser.push(contest[req.user.username]["score"]);
                 }
             }
@@ -571,7 +578,7 @@ router.route('/ranklist/:code')
                         contest[scores[i][2]][k]["p"] = 0;
                     }
                     pcodes[k] = {
-                        "score": contest[scores[i][2]][k]["score"],
+                        "score": (contest[scores[i][2]][k]["score"] || 0),
                         "p": contest[scores[i][2]][k]["p"]
                     }
                 }
