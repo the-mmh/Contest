@@ -14,8 +14,19 @@ var azure = require('../services/connectazure');
 const worker = async(pushed, done) => {
 
     //ToDO:
-    var contestSchema = pushed["contestSchema"];
-    var sub = pushed["sub"];
+    var contestSchema;
+    var sub;
+
+    await Submission.findOne({ 's_id': pushed }, (err, res) => {
+        if (err) throw err;
+        sub = res;
+    });
+
+    await Contest.findOne({ 'code': sub.ccode }, (err, res) => {
+        if (err) throw err;
+        contestSchema = res;
+    });
+
     if (contestSchema.score === undefined) {
         contestSchema.score = {};
     }

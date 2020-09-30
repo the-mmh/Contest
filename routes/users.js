@@ -13,7 +13,7 @@ const randomstring = require('randomstring');
 const userschema = joi.object().keys({
     email: joi.string().email().required(),
     username: joi.string().required(),
-    password: joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required(),
+    password: joi.string().regex(/^([a-zA-Z0-9]+){3,30}$/).required(),
     role: joi.string().required(),
     confirmationPassword: joi.any().valid(joi.ref('password')).required(),
     contact: joi.string().required()
@@ -192,7 +192,7 @@ router.route('/logout')
     .get((req, res) => {
         req.logout();
         req.flash('success', 'logged out');
-        res.redirect('/');
+        res.redirect('/users/login');
     });
 
 
