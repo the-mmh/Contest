@@ -19,20 +19,16 @@ const Contest = require('./models/contest');
 const { exec } = require("child_process");
 const { c, cpp, node, python, java } = require('compile-run');
 
-
 require('./config/passport');
-
 
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useUnifiedTopology', true);
 mongoose.set('useFindAndModify', false);
-
 mongoose.Promise = global.Promise;
 
 const uri = "mongodb+srv://piyushg9794:passwordnahi@123@contest.j9ls1.mongodb.net/logsn";
 mongoose.connect(uri, () => console.log("App Db success"))
     .catch(err => console.log(err));
-
 
 app.use(morgan('dev'));
 

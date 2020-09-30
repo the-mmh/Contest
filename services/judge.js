@@ -1,22 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
-const User = require('./models/user');
-const Ques = require('./models/ques');
-const Submission = require('./models/submission');
-const Contest = require('./models/contest');
+const User = require('../models/user');
+const Ques = require('../models/ques');
+const Submission = require('../models/submission');
+const Contest = require('../models/contest');
 const notifier = require('node-notifier');
 const { c, cpp, node, python, java } = require('compile-run');
 var fs = require('fs');
 const qrate = require('qrate');
-
-
-
-
-
+var azure = require('../services/connectazure');
 
 const worker = async(pushed, done) => {
 
+    //ToDO:
     var contestSchema = pushed["contestSchema"];
     var sub = pushed["sub"];
     if (contestSchema.score === undefined) {
@@ -60,6 +57,7 @@ const worker = async(pushed, done) => {
         });
 
         const path = __dirname + "/routes/submissions/" + sub.s_id + ".cpp";
+        azure.azuresubmissionread('submissions', sub.s_id + ".cpp", path);
         // console.log(input, output, path);
         Submission.updateOne({ "s_id": sub.s_id }, { $set: { "verdict": "Running on test case-" + (i + 1).toString() } }, (err, res) => {
             if (err) throw err;
@@ -97,6 +95,7 @@ const worker = async(pushed, done) => {
                     flag = 0;
                 }
             }
+            //TODO: delete file
         })
 
         // console.log("useroutput --- ", useroutput);

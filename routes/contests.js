@@ -13,11 +13,13 @@ var fs = require('fs');
 const qrate = require('qrate');
 const { stderr } = require('process');
 const { all } = require('./users');
-const q = require('../judge');
+const amqp = require('../services/sendamqp');
+const amqprec = require('../services/recieveamqp');
 const { google } = require('googleapis');
 const drive = google.drive('v3');
 const stream = require('stream');
 const cred = require('../config/cred');
+var azure = require('../services/connectazure');
 
 
 var app = express();
@@ -159,7 +161,6 @@ router.route('/quespage')
 //     }
 // });
 
-
 router.route('/quespage/prob/:probCode')
 
 .get(async(req, res) => {
@@ -171,9 +172,13 @@ router.route('/quespage/prob/:probCode')
         if (err) throw err;
         final1 = res;
     });
-    final1.statement = fs.readFileSync(__dirname + "/" + code + "/" + code + "s.txt", 'utf-8');
-    final1.input = fs.readFileSync(__dirname + "/" + code + "/" + code + "i.txt", 'utf-8');
-    final1.output = fs.readFileSync(__dirname + "/" + code + "/" + code + "o.txt", 'utf-8');
+    const shareName = "questions";
+    const fileName = code + '/' + code;
+
+    
+    final1.statement = `${(await azure.azurefilesread(shareName, fileName+ "s.txt")).toString()}`;
+    final1.input = `${(await azure.azurefilesread(shareName, fileName+ "i.txt")).toString()}`;
+    final1.output = `${(await azure.azurefilesread(shareName, fileName+ "o.txt")).toString()}`;
 
     // console.log("final -- ", final1);
 
@@ -256,9 +261,7 @@ router.route('/submit/:probCode')
         })
         if (now >= date && (date + (dur * 60 * 60 * 1000)) >= now) {
 
-            fs.writeFileSync(__dirname + '/submissions/' + sub.s_id + ".cpp", sub.code, 'utf8', (err) => {
-                if (err) throw err;
-            })
+            await azure.azurefilescreate('submissions', sub.s_id + ".cpp", sub.code)
 
             let bufst = new stream.PassThrough();
 
@@ -270,24 +273,33 @@ router.route('/submit/:probCode')
                 command = "g++";
             }
 
-            compilecommand = command + " " + __dirname + "/submissions/" + sub.s_id + ".cpp"
+            //Done: ToDo: update compile command to be compatible with azure
+            
+            await azure.azuresubmissionread('submissions', sub.s_id + ".cpp", __dirname + "/submissions/" + sub.s_id + ".cpp")
+            compilecommand = command + " " + __dirname + "/submissions/" + sub.s_id + ".cpp";
+            console.log(compilecommand);
 
             exec(compilecommand, (err, stdout, stderr) => {
                 if (err) {
                     console.log("Compile Error");
                     Submission.updateOne(sub, { $set: { 'verdict': "CE", 'time': 0, 'memory': 0 } }, (err, res) => {
                         if (err) throw err;
-                    })
+                    });
                 } else {
                     console.log("Compile Success");
                     Submission.updateOne(sub, { $set: { 'verdict': "In queue", "time": 0, "memory": 0 } }, (err, res) => {
                         if (err) throw err;
-                    })
-                    var topush = { contestSchema, sub };
+                    });
+                    //ToDO: create contestid & replace _id with it
+                    //var topush = [contestSchema._id, sub.s_id ];
+                    var topush = sub.s_id;
 
-                    q.push(topush);
+                    amqp.sendamqp(topush);
+                    amqprec.recieveamqp();
                     console.log("Queued");
                 }
+
+                //TODO: Delete file
             })
             res.redirect("/contests/submissions/1");
         } else if ((date + (dur * 60 * 60 * 1000)) < now) {
@@ -470,7 +482,7 @@ router.route('/usersubmission/:s_id')
 
 
         if (req.user.username === userdata.who || (date + dur * 60 * 60 * 1000) < now) {
-            code = fs.readFileSync(__dirname + '/submissions/' + s_id + '.cpp', 'utf-8').toString();
+            code = `${(await azure.azurefilesread('submissions', s_id + '.cpp')).toString()}`;
             // console.log(code);
 
             res.render('usersubmission', {
