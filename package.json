@@ -6,6 +6,9 @@
   "scripts": {
     "start": "nodemon src/server.js"
   },
+  "engines": {
+    "node": "10.16.0"
+  },
   "author": "SPG",
   "license": "ISC",
   "dependencies": {
