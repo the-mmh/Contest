@@ -1,0 +1,23 @@
+{
+  "name": "judge-server",
+  "version": "1.0.0",
+  "description": "Judge server for contester",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon src/server.js"
+  },
+  "author": "SPG",
+  "license": "ISC",
+  "dependencies": {
+    "@azure/storage-file-share": "^12.2.0",
+    "amqplib": "^0.6.0",
+    "compile-run": "^2.3.4",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "mongoose": "^5.10.7",
+    "node-notifier": "^8.0.0",
+    "qrate": "^1.2.0"
+  },
+  "devDependencies": {}
+}
