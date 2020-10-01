@@ -61,7 +61,7 @@ const worker = async(pushed, done) => {
 
         const path = __dirname + '/submissions/'+ sub.s_id + ".cpp";
         console.log(input, output, path);
-        azure.azuresubmissionread('submissions', sub.s_id + ".cpp", path);
+        await azure.azuresubmissionread('submissions', sub.s_id + ".cpp", path);
 
         Submission.updateOne({ "s_id": sub.s_id }, { $set: { "verdict": "Running on test case-" + (i + 1).toString() } }, (err, res) => {
             if (err) throw err;
