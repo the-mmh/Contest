@@ -26,7 +26,7 @@ function recieveamqp() {
                 console.log(" [x] Received %s", message);
                 await judge.worker(message);
                 console.log("done bhai")
-                //channel.ack(msg);
+                channel.ack(msg);
             }, {
                 noAck: false
             });
