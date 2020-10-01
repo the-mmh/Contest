@@ -14,7 +14,7 @@ const uri = process.env.MONGO_URI;
 mongoose.connect(uri, () => console.log("App Db success"))
     .catch(err => console.log(err));
 
-app.listen(5010, function(){
+app.listen(process.env.port || 5010, function(){
     amqp.recieveamqp();
     console.log("server is running on port 5010");
  });
