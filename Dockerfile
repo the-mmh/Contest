@@ -1,5 +1,5 @@
 FROM node:10
-WORKDIR /
+WORKDIR .
 
 RUN apk add g++
 COPY package.json .
