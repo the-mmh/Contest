@@ -4,7 +4,7 @@
   "description": "Judge server for contester",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon src/server.js"
+    "start": "node src/server.js"
   },
   "engines": {
     "node": "10.16.0"
