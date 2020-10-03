@@ -1,7 +1,9 @@
 FROM node:10
 WORKDIR .
 
-RUN apk add g++
+RUN sudo apt-get update
+RUN sudo apt-get install build-essential
+RUN g++ -v
 COPY package.json .
 RUN npm install --production
 COPY . .
