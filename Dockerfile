@@ -3,7 +3,7 @@ WORKDIR /
 
 RUN apk add g++
 COPY package.json .
-RUN nmp install --production
+RUN npm install --production
 COPY . .
 
 ENV MONGO_URI = mongodb+srv://piyushg9794:passwordnahi@123@contest.j9ls1.mongodb.net/logsn
