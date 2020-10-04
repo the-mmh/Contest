@@ -2,6 +2,9 @@ FROM node:10
 WORKDIR /app
 RUN apt-get update
 RUN apt-get install g++
+RUN apt-get install gcc
+RUN apt-get install python
+RUN apt-get install default-jdk
 COPY package.json /app
 RUN npm install
 COPY . /app

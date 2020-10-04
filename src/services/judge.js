@@ -27,9 +27,6 @@ const worker = async(pushed, done) => {
         contestSchema.score = {};
     }
     var score = contestSchema.score;
-    // console.log("f -- ", contestSchema.score, score);
-
-
 
     if (score[sub.who] === undefined) {
         score[sub.who] = {};
@@ -39,9 +36,6 @@ const worker = async(pushed, done) => {
         if (err) throw err;
         numofinputfiles = res.numofinputfiles;
     })
-
-    // console.log("numofinputfiles -- ", numofinputfiles);
-    // console.log("numofinputfiles -- ", sub.which);
 
     var flag = 1;
     var qno;
@@ -54,58 +48,99 @@ const worker = async(pushed, done) => {
         ut = res;
     });
 
+    function run_test(err, res){
+
+        if (err) {
+            console.log(err);
+            verd.time = 0;
+            verd.memory = 0;
+        } else {
+            console.log("res -- ", res);
+    
+            useroutput = res.stdout;
+            if (verd.time === undefined) {
+                verd.time = 0;
+            }
+            if (verd.memory === undefined) {
+                verd.memory = 0;
+            }
+    
+            verd.time = Math.max(Number(verd.time), Number(res.cpuUsage / 1000));
+            verd.memory = Math.max(Number(verd.memory), Number(Math.floor(res.memoryUsage / 1024)));
+            if (res.errorType) {
+    
+                error = res.errorType;
+                flag = 0;
+            } else if (Number(verd.time) > Number(ut.tl * 1000)) {
+                error = "tle";
+                verd.time = (ut.tl * 1000) + 1;
+                flag = 0;
+            } else if (verd.memory > ut.ml * 1024) {
+                error = "mle";
+                verd.memory = (ut.ml * 1024) + 1;
+                flag = 0;
+            }
+        }
+           
+    }
+    
+
+    var lang = sub.language;
+    var ext;
+    switch(lang){
+        case 'C++':
+            ext= '.cpp';
+            break;
+        case 'Python':
+            ext= '.py';
+            break;
+        case 'C':
+            ext= '.c';
+            break;
+        case 'Java':
+            ext= '.java';
+            break; 
+    }
+
     for (let i = 0; i < numofinputfiles; i++) {
         
         const input = `${(await azure.azurefilesread("questions", sub.which + "/" + sub.which + "i_" + (i + 1).toString() + ".txt")).toString()}`;
         const output = `${(await azure.azurefilesread("questions", sub.which + "/" + sub.which + "o_" + (i + 1).toString() + ".txt")).toString()}`;
 
-        const path = __dirname + '/submissions/'+ sub.s_id + ".cpp";
-        console.log(input, output, path);
-        await azure.azuresubmissionread('submissions', sub.s_id + ".cpp", path);
+        const path = __dirname + '/submissions/'+ sub.s_id + ext;
+        console.log(input, output);
+        await azure.azuresubmissionread('submissions', sub.s_id + ext, path);
 
         Submission.updateOne({ "s_id": sub.s_id }, { $set: { "verdict": "Running on test case-" + (i + 1).toString() } }, (err, res) => {
             if (err) throw err;
-        })
+        });
 
-        await cpp.runFile(path, { stdin: input, timeout: 0 }, (err, res) => {
-            if (err) {
-                console.log(err);
-                verd.time = 0;
-                verd.memory = 0;
-            } else {
-                console.log("res -- ", res);
+        switch(lang){
+            case 'C++':
+                await cpp.runFile(path, { stdin: input, timeout: 0 }, (err, res) => {
+                    run_test(err, res);    
+                });
+                break;
+            case 'Python':
+                await python.runFile(path, { stdin: input, timeout: 0 }, (err, res) => {
+                    run_test(err, res);    
+                });
+                break;
+            case 'C':
+                await c.runFile(path, { stdin: input, timeout: 0 }, (err, res) => {
+                    run_test(err, res);    
+                });
+                break;
+            case 'Java':
+                await java.runFile(path, { stdin: input, timeout: 0 }, (err, res) => {
+                    run_test(err, res);    
+                });
+                break;
+        }
 
-                useroutput = res.stdout;
-                if (verd.time === undefined) {
-                    verd.time = 0;
-                }
-                if (verd.memory === undefined) {
-                    verd.memory = 0;
-                }
-
-                verd.time = Math.max(Number(verd.time), Number(res.cpuUsage / 1000));
-                verd.memory = Math.max(Number(verd.memory), Number(Math.floor(res.memoryUsage / 1024)));
-                if (res.errorType) {
-
-                    error = res.errorType;
-                    flag = 0;
-                } else if (Number(verd.time) > Number(ut.tl * 1000)) {
-                    error = "tle";
-                    verd.time = (ut.tl * 1000) + 1;
-                    flag = 0;
-                } else if (verd.memory > ut.ml * 1024) {
-                    error = "mle";
-                    verd.memory = (ut.ml * 1024) + 1;
-                    flag = 0;
-                }
-            }
-            
-            fs.unlinkSync(path, (err) => {
-                if (err) throw err;
-            });
-        })
-
-        // console.log("useroutput --- ", useroutput);
+        fs.unlinkSync(path, (err) => {
+            if (err) throw err;
+        });
 
         if (useroutput.toString().trim() !== output || flag === 0) {
             flag = 0;
