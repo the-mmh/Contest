@@ -2,7 +2,7 @@ FROM node:10
 WORKDIR .
 
 RUN sudo apt-get update
-RUN sudo apt-get install build-essential
+RUN sudo apt-get install g++
 RUN g++ -v
 COPY package.json .
 RUN npm install --production
