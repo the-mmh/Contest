@@ -5,6 +5,7 @@ const { c, cpp, node, python, java } = require('compile-run');
 var azure = require('./connectazure');
 var fs = require('fs');
 //const notifier = require('node-notifier');
+const amqp = require('../services/sendverdict');
 const qrate = require('qrate');
 
 const worker = async(pushed, done) => {
@@ -13,15 +14,9 @@ const worker = async(pushed, done) => {
     var sub;
     console.log('worker started');
 
-    await Submission.findOne({ 's_id': pushed }, (err, res) => {
-        if (err) throw err;
-        sub = res;
-    });
+    sub = await Submission.findOne({ 's_id': pushed });
 
-    await Contest.findOne({ 'code': sub.ccode }, (err, res) => {
-        if (err) throw err;
-        contestSchema = res;
-    });
+    contestSchema = await Contest.findOne({ 'code': sub.ccode });
 
     if (contestSchema.score === undefined) {
         contestSchema.score = {};
@@ -48,15 +43,15 @@ const worker = async(pushed, done) => {
         ut = res;
     });
 
-    function run_test(err, res){
+    function run_test(err, res) {
 
         if (err) {
             console.log(err);
             verd.time = 0;
             verd.memory = 0;
         } else {
-            console.log("res -- ", res);
-    
+
+
             useroutput = res.stdout;
             if (verd.time === undefined) {
                 verd.time = 0;
@@ -64,11 +59,11 @@ const worker = async(pushed, done) => {
             if (verd.memory === undefined) {
                 verd.memory = 0;
             }
-    
+
             verd.time = Math.max(Number(verd.time), Number(res.cpuUsage / 1000));
             verd.memory = Math.max(Number(verd.memory), Number(Math.floor(res.memoryUsage / 1024)));
             if (res.errorType) {
-    
+
                 error = res.errorType;
                 flag = 0;
             } else if (Number(verd.time) > Number(ut.tl * 1000)) {
@@ -81,59 +76,64 @@ const worker = async(pushed, done) => {
                 flag = 0;
             }
         }
-           
+
     }
-    
+
 
     var lang = sub.language;
     var ext;
-    switch(lang){
+    switch (lang) {
         case 'C++':
-            ext= '.cpp';
+            ext = '.cpp';
             break;
         case 'Python':
-            ext= '.py';
+            ext = '.py';
             break;
         case 'C':
-            ext= '.c';
+            ext = '.c';
             break;
         case 'Java':
-            ext= '.java';
-            break; 
+            ext = '.java';
+            break;
     }
 
     for (let i = 0; i < numofinputfiles; i++) {
-        
+
         const input = `${(await azure.azurefilesread("questions", sub.which + "/" + sub.which + "i_" + (i + 1).toString() + ".txt")).toString()}`;
         const output = `${(await azure.azurefilesread("questions", sub.which + "/" + sub.which + "o_" + (i + 1).toString() + ".txt")).toString()}`;
 
-        const path = __dirname + '/submissions/'+ sub.s_id + ext;
+        const path = __dirname + '/submissions/' + sub.s_id + ext;
         console.log(input, output);
         await azure.azuresubmissionread('submissions', sub.s_id + ext, path);
+
+        var sendver = "Running on test case-" + (i + 1).toString();
+
+        var topush = (sendver + ',0,0,' + sub.s_id).toString();
+        amqp.sendverdict(topush);
 
         Submission.updateOne({ "s_id": sub.s_id }, { $set: { "verdict": "Running on test case-" + (i + 1).toString() } }, (err, res) => {
             if (err) throw err;
         });
 
-        switch(lang){
+        switch (lang) {
             case 'C++':
                 await cpp.runFile(path, { stdin: input, timeout: 0 }, (err, res) => {
-                    run_test(err, res);    
+                    run_test(err, res);
                 });
                 break;
             case 'Python':
                 await python.runFile(path, { stdin: input, timeout: 0 }, (err, res) => {
-                    run_test(err, res);    
+                    run_test(err, res);
                 });
                 break;
             case 'C':
                 await c.runFile(path, { stdin: input, timeout: 0 }, (err, res) => {
-                    run_test(err, res);    
+                    run_test(err, res);
                 });
                 break;
             case 'Java':
                 await java.runFile(path, { stdin: input, timeout: 0 }, (err, res) => {
-                    run_test(err, res);    
+                    run_test(err, res);
                 });
                 break;
         }
@@ -195,6 +195,8 @@ const worker = async(pushed, done) => {
     })
 
     verd.verdi = verdi;
+    var topush = (verdi + ',' + verd.time + ',' + verd.memory + ',' + sub.s_id).toString();
+    amqp.sendverdict(topush);
 
     await Submission.updateMany({ "s_id": sub.s_id }, { $set: { "verdict": verd.verdi, 'time': verd.time, 'memory': verd.memory } }, (err, res) => {
         if (err) throw err;
@@ -206,7 +208,7 @@ const worker = async(pushed, done) => {
 
 const q = qrate(worker, 4);
 
-function queue(msg){
+function queue(msg) {
     q.push(msg);
 }
 
