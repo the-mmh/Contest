@@ -24,8 +24,9 @@ function recieveamqp() {
             channel.consume(queue, async function(msg) {
                 var message = msg.content.toString();
                 console.log(" [x] Received %s", message);
-                await judge.worker(message);
-                console.log("done bhai")
+                
+                judge.queue(message);
+                console.log("qrated");
                 channel.ack(msg);
             }, {
                 noAck: false

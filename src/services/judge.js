@@ -204,8 +204,10 @@ const worker = async(pushed, done) => {
     //setTimeout(done, Number(sub.tl) * 1000);
 }
 
+const q = qrate(worker, 4);
 
-//const q = qrate(worker);
+function queue(msg){
+    q.push(msg);
+}
 
-module.exports.worker = worker
-//module.exports.queue = queue
+module.exports.queue = queue
