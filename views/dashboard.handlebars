@@ -1,0 +1,72 @@
+
+<div>  
+  <h1>Welcome {{username}}</h1>
+  <div class = "container">
+    <div class = "row">
+      <div class = "col-sm-10" style = "text-align: left;">
+        <div class = "row">
+          <div id = "conhead" class = "col-sm-3" style = "text-align: left;">
+            <b>Contact: </b>
+          </div>
+          <div id = "concon" class = "col-sm-3" style = "text-align: left;">
+            {{contact}}
+            
+          </div>
+          <div id="conedit" class = "col-sm-3" style = "text-align: right;">
+            
+            <button id="contactedit" onclick="fn()" type="submit">Edit</button>
+          </div>
+        </div>
+        <div class = "row">
+          <div class = "col-sm-3" style = "text-align: left;">
+            <b>Email: </b>
+          </div>
+          <div class = "col-sm-3" style = "text-align: left;">
+            {{email}}
+          </div>
+        </div>
+      </div>
+      <div class = "col-sm-2" style = "text-align: right;">
+        {{#if admin}}
+          <a href="/admin">Admin Page</a><br />
+        {{/if}}
+        <a href = "/users/{{username}}/submissions/1">Submissions</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="demo"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+<script>
+  
+  var fn = () => {
+    var x = document.getElementById("contactedit").innerHTML;
+    if(x === "Edit"){
+      document.getElementById("contactedit").innerHTML = "Save";
+      x = document.getElementById("concon").innerHTML;
+      $("#concon").html('');
+      var inp = '<input type="text" id = "concon1" value='+x+' name="concon1" />'
+      $("#concon").append(inp);
+      
+    } else {
+      
+      
+      x = document.getElementById("concon1").value;
+      
+      if(x.length<1){
+        document.getElementById("demo").innerHTML = "Contact field can't be empty";
+        document.getElementById("demo").style.color = "red";
+        return;
+      }
+      x = (x.toString()).trim();
+      $("#demo").html('');
+      document.getElementById("contactedit").innerHTML = "Edit";
+      $.post("/users/edit", {newcontact: x});
+      $("#concon").html('');
+      document.getElementById("concon").innerHTML = x;
+    }
+  }
+</script>
+

@@ -1,0 +1,3 @@
+AZURE_STORAGE_CONNECTION_STRING = 'DefaultEndpointsProtocol=https;AccountName=contestiiitp;AccountKey=Lxj7+F1JeursnOcs/223ujVDzn9aQ3e3B6tYXmEwEq1aQbdG1ATtoWijQdp1gVvJHBQ0PiB/RTiRB42e4shKKw==;EndpointSuffix=core.windows.net',
+MONGO_USERNAME =
+MONGO_PASSWORD = 

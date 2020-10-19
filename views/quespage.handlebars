@@ -1,0 +1,82 @@
+
+
+<br />
+<br />
+{{> navcontest}}
+
+<br />
+<br />
+
+<style>
+	.probs{
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+		
+		
+		width: 85%;
+	}
+	.sec{
+		padding:20px;
+		text-align: center;
+		justify-content: center;
+	}
+</style>
+
+
+
+	<h5>{{CName}} ({{CCode}})</h5>
+	
+	
+	<div class = "probs">
+		<div class = "sec">
+			
+			<br />
+			<div class="container">
+				<h5 align="left" id = "pt"></h5>
+				<div class = "row" id = "list">
+					<img src="/big.gif" width="100%" />
+				</div>
+			</div>
+		</div>
+		<div class = "sec">
+			<b id = "status"></b>
+			<br />
+			<l id = "rank"></l>
+			<br />
+		</div>
+	</div>
+
+<script>
+	$("#conCode").ready(function(){
+		$.ajax({
+            url: '/contests/queslist',
+            success: function(res) {
+				console.log(res);
+				$('#pt').html('');
+				$('#pt').append(res.pt);
+				
+				$('#status').html('');
+				$('#status').append(res.CStatus);
+
+                var list = $('#list'), x='';
+                list.html('');
+				res.CProblems = res.CProblems || [];
+                
+				var i=1;
+                res.CProblems.forEach((qu) => {
+                    x+=('<tr><td>'+i+'</td><td><a id="queslink" href="/contests/quespage/prob/'+qu[0]+'">'+qu[0]+'</a></td><td>'+qu[1]+'</td><td>'+qu[2]+'</td><td>'+qu[3]+'</td></tr>');
+					i++;
+                });
+				if(res.CProblems.length>0){
+					list.append('<table><tr><th>S. No.</th><th>Problem</th><th>Time</th><th>Memory</th><th>Score</th></tr>'+x+'</table>');
+				}
+
+				$('#rank').html('');
+				if(res.CProblems.length>0){
+					$('#rank').append('<a id="ranklist" href = "/contests/ranklist/{{CCode}}">Ranklist</a>')
+				}
+            }
+        })
+	})
+</script>
+	
