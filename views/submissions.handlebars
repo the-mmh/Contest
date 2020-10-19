@@ -17,6 +17,7 @@
     }
     .verd{
        font-weight:600;
+       font-size: 14px;
         
     }
 
@@ -109,13 +110,13 @@ Page <z id="lpages"></z> of <z id="llasts"></z>
                     ');
                     var y="verdict"+data[i][0];
                     var x=data[i][4];
-                    if(x=="Accepted"){
+                   if(x=="Accepted"){
                         document.getElementById(y).style.color="green";
                     }else if(x=="Compiling" || x=="In queue"){
-                        document.getElementById(y).style.color="yellow";
+                        document.getElementById(y).style.color="DodgerBlue";
                     }
                     else if(x=="CE"){
-                        document.getElementById(y).style.color="orange";
+                        document.getElementById(y).style.color="Orange";
                     }
                     else{
                         document.getElementById(y).style.color="red";
