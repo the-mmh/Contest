@@ -321,19 +321,19 @@ router.route('/submit/:probCode')
 
         var date, now = Date.now();
         var dur = contestSchema.duration;
+        var gett;
+        gett = await Contest.findOne({ 'code': contestSchema.code }, 'date duration');
 
-        await Contest.findOne({ 'code': contestSchema.code }, 'date duration', (err, res) => {
-            if (err) throw err;
-            date = res.date.getTime();
-            dur = res.duration;
+        date = gett.date.getTime();
+        dur = gett.duration;
 
-        })
+
         if (now >= date && (date + (dur * 60 * 60 * 1000)) >= now) {
 
             var lang = sub.language;
             var command;
             var ext;
-            switch(lang){
+            switch (lang) {
                 case 'C++':
                     command = "g++";
                     ext = ".cpp";
@@ -349,9 +349,9 @@ router.route('/submit/:probCode')
                 case 'Java':
                     command = "java";
                     ext = ".java";
-                    break; 
+                    break;
             }
-            
+
             await azure.azurefilescreate('submissions', sub.s_id + ext, sub.code);
             let bufst = new stream.PassThrough();
 
@@ -373,7 +373,7 @@ router.route('/submit/:probCode')
                     });
 
                     var topush = sub.s_id;
-                    await amqp.sendamqp(topush);
+                    amqp.sendamqp(topush);
                     console.log("Queued");
                 }
 
