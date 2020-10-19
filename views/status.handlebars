@@ -92,7 +92,10 @@ Page <z id="lpage"></z> of <z id="llast"></z>
                     if(x=="Accepted"){
                         document.getElementById(y).style.color="green";
                     }else if(x=="Compiling" || x=="In queue"){
-                        document.getElementById(y).style.color="blue";
+                        document.getElementById(y).style.color="yellow";
+                    }
+                    else if(x=="CE"){
+                        document.getElementById(y).style.color="orange";
                     }
                     else{
                         document.getElementById(y).style.color="red";
