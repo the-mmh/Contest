@@ -6,6 +6,7 @@ CLOUDAMQP_URL = process.env.CLOUDAMQP_URL;
 function recieveamqp() {
     amqp.connect(CLOUDAMQP_URL, function(error0, connection) {
         if (error0) {
+            req.flash('error', "Some error occurred in receiving submission");
             throw error0;
         }
         console.log('CloudAMQP Connected');
@@ -21,19 +22,24 @@ function recieveamqp() {
             });
 
             console.log(" [*] Waiting for messages in %s", queue);
-            channel.consume(queue, async function(msg) {
-                var message = msg.content.toString();
-                console.log(" [x] Received %s", message);
-                
-                judge.queue(message);
-                console.log("qrated");
-                channel.ack(msg);
-            }, {
-                noAck: false
-            });
+
+            try {
+                channel.consume(queue, async function(msg) {
+                    var message = msg.content.toString();
+                    console.log(" [x] Received %s", message);
+
+                    judge.queue(message);
+                    console.log("qrated");
+                    channel.ack(msg);
+                }, {
+                    noAck: false
+                });
+            } catch (error) {
+                req.flash('error', "Some error occurred in receiving submission");
+
+            }
         });
     });
 }
 
 module.exports.recieveamqp = recieveamqp;
-

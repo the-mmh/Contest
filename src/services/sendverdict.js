@@ -17,9 +17,12 @@ function sendverdict(msg) {
             channel.assertQueue(queue, {
                 durable: true
             });
-            console.log(msg);
-            channel.sendToQueue(queue, Buffer.from(msg), { persistent: true });
-            console.log(" [x] Sent %s", msg);
+            try {
+                channel.sendToQueue(queue, Buffer.from(msg), { persistent: true });
+                console.log(" [x] Sent %s", msg);
+            } catch (error) {
+                next(error);
+            }
         });
         setTimeout(function() {
             connection.close();
