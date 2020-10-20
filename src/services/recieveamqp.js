@@ -27,7 +27,7 @@ function recieveamqp() {
                 
                 judge.queue(message);
                 console.log("qrated");
-                channel.ack(msg);
+                //channel.ack(msg);
             }, {
                 noAck: false
             });

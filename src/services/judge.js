@@ -7,6 +7,7 @@ var fs = require('fs');
 //const notifier = require('node-notifier');
 const amqp = require('../services/sendverdict');
 const qrate = require('qrate');
+var pathm = require('path');
 
 const worker = async(pushed, done) => {
 
@@ -51,7 +52,6 @@ const worker = async(pushed, done) => {
             verd.memory = 0;
         } else {
 
-
             useroutput = res.stdout;
             if (verd.time === undefined) {
                 verd.time = 0;
@@ -81,6 +81,7 @@ const worker = async(pushed, done) => {
 
 
     var lang = sub.language;
+    var user = sub.who;
     var ext;
     switch (lang) {
         case 'C++':
@@ -102,9 +103,23 @@ const worker = async(pushed, done) => {
         const input = `${(await azure.azurefilesread("questions", sub.which + "/" + sub.which + "i_" + (i + 1).toString() + ".txt")).toString()}`;
         const output = `${(await azure.azurefilesread("questions", sub.which + "/" + sub.which + "o_" + (i + 1).toString() + ".txt")).toString()}`;
 
-        const path = __dirname + '/submissions/' + sub.s_id + ext;
-        console.log(input, output);
+        var path, jdir, jtime;
+        if(lang === 'Java'){
+            jtime = Date.now();
+            jdir = __dirname + '/submissions/' + user + '/' + jtime;
+            if(!fs.existsSync(jdir)){
+                fs.mkdirSync(jdir, { recursive: true });
+            }
+            path = jdir +'/'+ 'Solution' + ext;
+        }
+        else{
+            path = __dirname + '/submissions/' + sub.s_id + ext;
+        }
+
         await azure.azuresubmissionread('submissions', sub.s_id + ext, path);
+        /*fs.writeFileSync(path, sub.code, (err) => {
+            if (err) console.log(err)
+        });*/
 
         var sendver = "Running on test case-" + (i + 1).toString();
 
@@ -141,6 +156,11 @@ const worker = async(pushed, done) => {
         fs.unlinkSync(path, (err) => {
             if (err) throw err;
         });
+        if(lang === 'Java'){
+            fs.rmdirSync(jdir, { recursive: true}, (err) => {
+                if (err) throw err;
+            });
+        }
 
         if (useroutput.toString().trim() !== output || flag === 0) {
             flag = 0;
