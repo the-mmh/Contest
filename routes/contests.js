@@ -11,7 +11,7 @@ const notifier = require('node-notifier');
 const url = require('url');
 const amqp = require('../services/sendamqp');
 var fs = require('fs');
-
+const main = require('../app');
 const stream = require('stream');
 
 var azure = require('../services/connectazure');
@@ -165,11 +165,18 @@ router.route('/quespage')
 
 .get(async(req, res) => {
     // try {
-    res.render('quespage', {
-        CName: contestSchema.name,
-        CCode: contestSchema.code,
-
-    });
+    if (req.user !== undefined) {
+        res.render('quespage', {
+            CName: contestSchema.name,
+            CCode: contestSchema.code,
+            user: req.user.username
+        });
+    } else {
+        res.render('quespage', {
+            CName: contestSchema.name,
+            CCode: contestSchema.code
+        });
+    }
 
 })
 
@@ -182,9 +189,6 @@ router.route('/quespage/prob/:probCode')
 
         var final1 = {},
             code = req.params.probCode;
-
-
-
         res.render('prob', {
 
 
@@ -216,6 +220,7 @@ router.route('/getprobmain/:probCode')
                 code = req.params.probCode;
 
             const shareName = "questions";
+
             const fileName = code + '/' + code;
             final1.statement = `${(await azure.azurefilesread(shareName, fileName+ "s.txt")).toString()}`;
             final1.input = `${(await azure.azurefilesread(shareName, fileName+ "i.txt")).toString()}`;
@@ -339,7 +344,7 @@ router.route('/submit/:probCode')
                     ext = ".cpp";
                     break;
                 case 'Python':
-                    command = "python";
+                    command = "python -m py_compile";
                     ext = ".py";
                     break;
                 case 'C':
@@ -347,7 +352,7 @@ router.route('/submit/:probCode')
                     ext = ".c";
                     break;
                 case 'Java':
-                    command = "java";
+                    command = "javac";
                     ext = ".java";
                     break;
             }
@@ -363,6 +368,11 @@ router.route('/submit/:probCode')
             exec(compilecommand, async(err, stdout, stderr) => {
                 if (err) {
                     console.log("Compile Error");
+                    main.io.emit('change', {
+                        verdict: "Compilation Error",
+                        time: 0,
+                        memory: 0
+                    })
                     Submission.updateOne(sub, { $set: { 'verdict': "CE", 'time': 0, 'memory': 0 } }, (err, res) => {
                         if (err) throw err;
                     });
@@ -375,13 +385,14 @@ router.route('/submit/:probCode')
                     var topush = sub.s_id;
                     amqp.sendamqp(topush);
                     console.log("Queued");
+
                 }
 
                 fs.unlinkSync(path, (err) => {
                     if (err) throw err;
                 });
             })
-            res.redirect("/users/" + req.user.username + "/submissions/1");
+            res.redirect("/users/submissions/" + req.user.username + "/submissions/1");
         } else if ((date + (dur * 60 * 60 * 1000)) < now) {
             res.redirect("/contests/quespage");
             notifier.notify('Contest is ended');
@@ -467,8 +478,13 @@ router.route('/status/:page')
         //         page: page,
         //         nos: numofsubspage,
         //     })
-
-        res.render("status");
+        if (req.user !== undefined) {
+            res.render("status", {
+                user: req.user.username
+            });
+        } else {
+            res.render("status");
+        }
 
         // } catch (error) {
         //     req.flash('error', "Sorry, Some error ocurred");
@@ -483,7 +499,7 @@ router.route('/statusdetails/:page')
 
         var subs = [],
             res1;
-        res1 = await Submission.find({}, 's_id who when which verdict time memory');
+        res1 = await Submission.find({}, 's_id who when which verdict time memory language');
 
         var temp = {};
 
@@ -504,9 +520,11 @@ router.route('/statusdetails/:page')
             obj.push(res1[i].who);
             obj.push(res1[i].which);
             obj.push(res1[i].when);
+
             obj.push(res1[i].verdict);
             obj.push(res1[i].time);
             obj.push(res1[i].memory);
+            obj.push(res1[i].language);
             temp[res1[i].when] = obj;
         }
 
@@ -723,7 +741,7 @@ router.route('/getranklist/:code')
 
         data += '<td>' + show[k]['rank'] + '</td>';
 
-        data += '<td><a href="/users/' + k + '">' + k + '</a></td>';
+        data += '<td><a href="/users/user/' + k + '">' + k + '</a></td>';
         data += '<td>' + (show[k].score || 0).toString() + '</td>';
         data += '<td>' + (show[k].penalty || 0).toString() + '</td>';
 

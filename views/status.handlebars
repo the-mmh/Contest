@@ -30,6 +30,7 @@
             <th>User</th>
             <th>ProbCode</th>
             <th>DT</th>
+            <th>Language</th>
             <th>Verdict</th>
             <th>Time</th>
             <th>Memory</th>
@@ -79,10 +80,11 @@ Page <z id="lpage"></z> of <z id="llast"></z>
                      console.log(data[i][0]);
                     st.append('\
                         <tr>\
-                            <td><a href="/users/'+data[i][1]+'/'+data[i][0]+'">' + data[i][0] + '</a></td>\
-                            <td>' + data[i][1] + '</td>\
+                            <td><a href="/users/usersubmission/'+data[i][1]+'/'+data[i][0]+'">' + data[i][0] + '</a></td>\
+                            <td><a href="/users/user/'+data[i][1]+'" />' + data[i][1] + '</a></td>\
                             <td>' + data[i][2] + '</td>\
                             <td>' + data[i][3] + '</td>\
+                            <td>' + data[i][7] + '</td>\
                             <td class="verd" id = "'+data[i][0]+'">' + data[i][4] + '</td>\
                             <td>' + data[i][5] + 'ms</td>\
                             <td>' + data[i][6] + 'KB</td>\

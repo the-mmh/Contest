@@ -112,12 +112,7 @@ Code:
               <option value="dark1" >Dark1</option>
               <option value="dark2">Dark2</option>
     </select>  
-             <div id="editor" style="border: solid lightblue;" name="editor" onkeyup="funct()">function foo(items) {
-                var i;
-                for (i = 0; i &lt; items.length; i++) {
-                    alert("Ace Rocks " + items[i]);
-                }
-                }</div>    
+             <div id="editor" style="border: solid lightblue;" name="editor" onkeyup="funct()"></div>    
              <input type="hidden" name="code" id="code"> 
   
 
@@ -180,7 +175,7 @@ editor.setValue("#include <stdio.h>\n\n\nint main() {\n    // Complete the code.
     }
     if (modeValue == "Java") {
     	editor.session.setMode("ace/mode/java");
-    	editor.setValue("import java.util.*;\nimport java.lang.*;\nimport java.io.*;\n\nclass Main\npublic static void main (String[] args)]\n	{\n		// your code goes here\n	}\n}");
+    	editor.setValue("import java.util.*;\nimport java.lang.*;\nimport java.io.*;\n\nclass Solution{\npublic static void main (String[] args)\n	{\n		// your code goes here\n	}\n}");
         editor.clearSelection();
         document.getElementById('langExt').innerHTML = "java";
     }

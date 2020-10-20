@@ -34,7 +34,21 @@
         $('#time'+id).html(data.time+"ms");
         $('#memory'+id).html('');
         $('#memory'+id).html(data.memory+"KB");
-
+        var y="verdict"+id;
+        var x=data.verdict;
+        if(x=="Accepted"){
+            document.getElementById(y).style.color="green";
+        }else if(x=="Compiling" || x=="In queue"){
+            document.getElementById(y).style.color="DodgerBlue";
+        }
+        else if(x=="CE"){
+            document.getElementById(y).style.color="Orange";
+        }
+        else if(x[0] == "w" || x[3] == '-'){
+            document.getElementById(y).style.color="red";
+        } else {
+            document.getElementById(y).style.color="black";
+        }
     })
 
 
@@ -49,6 +63,7 @@
             <th>User</th>
             <th>ProbCode</th>
             <th>DT</th>
+            <th>Language</th>
             <th>Verdict</th>
             <th>Time</th>
             <th>Memory</th>
@@ -89,7 +104,7 @@ Page <z id="lpages"></z> of <z id="llasts"></z>
     
         $.ajax({
             
-            url: '/users/{{user}}/getsub/'+cp,
+            url: '/users/submissions/{{user}}/getsub/'+cp,
             success: (res) => {
                 console.log(res);
                 var st = $("#subdet");
@@ -99,10 +114,11 @@ Page <z id="lpages"></z> of <z id="llasts"></z>
 
                     st.append('\
                         <tr>\
-                            <td><a href="/users/'+data[i][1]+'/'+data[i][0]+'">' + data[i][0] + '</a></td>\
-                            <td>' + data[i][1] + '</td>\
+                            <td><a href="/users/usersubmission/'+data[i][1]+'/'+data[i][0]+'">' + data[i][0] + '</a></td>\
+                            <td><a href="/users/user/'+data[i][1]+'" />' + data[i][1] + '</a></td>\
                             <td>' + data[i][2] + '</td>\
                             <td>' + data[i][3] + '</td>\
+                            <td>' + data[i][7] + '</td>\
                             <td class="verd" id = "verdict'+data[i][0]+'">' + data[i][4] + '</td>\
                             <td id = "time'+data[i][0]+'">' + data[i][5] + 'ms</td>\
                             <td id = "memory'+data[i][0]+'">' + data[i][6] + 'KB</td>\
@@ -110,7 +126,7 @@ Page <z id="lpages"></z> of <z id="llasts"></z>
                     ');
                     var y="verdict"+data[i][0];
                     var x=data[i][4];
-                   if(x=="Accepted"){
+                    if(x=="Accepted"){
                         document.getElementById(y).style.color="green";
                     }else if(x=="Compiling" || x=="In queue"){
                         document.getElementById(y).style.color="DodgerBlue";
@@ -118,8 +134,10 @@ Page <z id="lpages"></z> of <z id="llasts"></z>
                     else if(x=="CE"){
                         document.getElementById(y).style.color="Orange";
                     }
-                    else{
+                    else if(x[0] == "w" || x[3] == '-'){
                         document.getElementById(y).style.color="red";
+                    } else {
+                        document.getElementById(y).style.color="black";
                     }
                     
                 }
@@ -132,24 +150,24 @@ Page <z id="lpages"></z> of <z id="llasts"></z>
                     if(res.checkm){
                         sp.append('\
                             <ul class="pagination justify-content-center">\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/1" value="1"> First </a></li>\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/'+res.prev+'" value="'+res.prev+'"> &laquo; </a></li>\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/'+res.midp+'" value="'+res.midp+'"> '+res.midp+' </a></li>\
-                                <li class="page-item active"><a class="page-link" href = "/users/'+user+'/submissions/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/'+res.next+'" value="'+res.next+'"> &raquo; </a></li>\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/'+res.mid+'" value="'+res.mid+'"> '+res.mid+' </a></li>\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/'+res.last+'" value="'+res.last+'"> Last </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/1" value="1"> First </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.prev+'" value="'+res.prev+'"> &laquo; </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.midp+'" value="'+res.midp+'"> '+res.midp+' </a></li>\
+                                <li class="page-item active"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.next+'" value="'+res.next+'"> &raquo; </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.mid+'" value="'+res.mid+'"> '+res.mid+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.last+'" value="'+res.last+'"> Last </a></li>\
                             </ul>\
                         ');
                     } else {
                         sp.append('\
                             <ul class="pagination justify-content-center">\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/1" value="1"> First </a></li>\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/'+res.prev+'" value="'+res.prev+'"> &laquo; </a></li>\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/'+res.midp+'" value="'+res.midp+'"> '+res.midp+' </a></li>\
-                                <li class="page-item active"><a class="page-link" href = "/users/'+user+'/submissions/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/'+res.next+'" value="'+res.next+'"> &raquo; </a></li>\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/'+res.last+'" value="'+res.last+'"> Last </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/1" value="1"> First </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.prev+'" value="'+res.prev+'"> &laquo; </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.midp+'" value="'+res.midp+'"> '+res.midp+' </a></li>\
+                                <li class="page-item active"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.next+'" value="'+res.next+'"> &raquo; </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.last+'" value="'+res.last+'"> Last </a></li>\
                             </ul>\
                         ');
                     }
@@ -157,22 +175,22 @@ Page <z id="lpages"></z> of <z id="llasts"></z>
                     if(res.checkm){
                         sp.append('\
                             <ul class="pagination justify-content-center">\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/1" value="1"> First </a></li>\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/'+res.prev+'" value="'+res.prev+'"> &laquo; </a></li>\
-                                <li class="page-item active"><a class="page-link" href = "/users/'+user+'/submissions/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/'+res.next+'" value="'+res.next+'"> &raquo; </a></li>\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/'+res.mid+'" value="'+res.mid+'"> '+res.mid+' </a></li>\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/'+res.last+'" value="'+res.last+'"> Last </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/1" value="1"> First </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.prev+'" value="'+res.prev+'"> &laquo; </a></li>\
+                                <li class="page-item active"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.next+'" value="'+res.next+'"> &raquo; </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.mid+'" value="'+res.mid+'"> '+res.mid+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.last+'" value="'+res.last+'"> Last </a></li>\
                             </ul>\
                         ');
                     } else {
                         sp.append('\
                             <ul class="pagination justify-content-center">\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/1" value="1"> First </a></li>\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/'+res.prev+'" value="'+res.prev+'"> &laquo; </a></li>\
-                                <li class="page-item active"><a class="page-link" href = "/users/'+user+'/submissions/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/'+res.next+'" value="'+res.next+'"> &raquo; </a></li>\
-                                <li class="page-item"><a class="page-link" href = "/users/'+user+'/submissions/'+res.last+'" value="'+res.last+'"> Last </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/1" value="1"> First </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.prev+'" value="'+res.prev+'"> &laquo; </a></li>\
+                                <li class="page-item active"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.next+'" value="'+res.next+'"> &raquo; </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.last+'" value="'+res.last+'"> Last </a></li>\
                             </ul>\
                         ');
                     }

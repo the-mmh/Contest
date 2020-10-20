@@ -1,18 +1,16 @@
 const express = require('express');
 const router = express.Router();
 
-const bodyParser = require('body-parser');
-
 const Ques = require('../models/ques');
 const Contest = require('../models/contest');
+const amqp = require('../services/sendamqp');
 
+var azure = require('../services/connectazure');
 const url = require('url');
 var app = express();
-app.use(express.urlencoded({ extended: true }));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-
+var fs = require('fs');
+var busboy = require('connect-busboy');
+app.use(busboy);
 
 router.route('/')
     .get(async(req, res) => {
@@ -39,16 +37,16 @@ router.route('/')
 router.route('/addquestion')
     .get(async(req, res) => {
         try {
-            if (req.user === undefined) {
-                req.flash('error', 'you must be registered and admin');
-                res.redirect('/');
-                return;
-            }
-            if (req.user.role !== "admin") {
-                req.flash('error', 'you must be admin');
-                res.redirect('/');
-                return;
-            }
+            // if (req.user === undefined) {
+            //     req.flash('error', 'you must be registered and admin');
+            //     res.redirect('/');
+            //     return;
+            // }
+            // if (req.user.role !== "admin") {
+            //     req.flash('error', 'you must be admin');
+            //     res.redirect('/');
+            //     return;
+            // }
             res.render('addquestion');
         } catch (error) {
             req.flash('error', 'Sorry, Some error occurred');
@@ -57,21 +55,52 @@ router.route('/addquestion')
     })
     .post(async(req, res) => {
         try {
-            if (req.user === undefined) {
-                req.flash('error', 'you must be registered and admin');
-                res.redirect('/');
-                return;
-            }
-            if (req.user.role !== "admin") {
-                req.flash('error', 'you must be admin');
-                res.redirect('/');
+            // if (req.user === undefined) {
+            //     req.flash('error', 'you must be registered and admin');
+            //     res.redirect('/');
+            //     return;
+            // }
+            // if (req.user.role !== "admin") {
+            //     req.flash('error', 'you must be admin');
+            //     res.redirect('/');
+            //     return;
+            // }
+
+
+            var content;
+            req.pipe(req.busboy);
+            req.busboy.on('file', function(fieldname, file, filename) {
+                console.log("Uploading: " + filename);
+                console.log(__dirname);
+                fs.createWriteStream(__dirname + '/' + filename);
+
+
+
+            });
+
+            const data = await JSON.parse(JSON.stringify(req.body));
+
+
+            // >>>> Statement file to be uploaded here
+            // content is stores in 'content' variable<<<<<,
+            // make a directory named 'probCode'
+            // save file with name 'probCode'+'s'
+
+            // await azure.azurefilescreate('question', filename);
+
+
+
+            if ((Object.keys(await JSON.parse(JSON.stringify(req.body)))).length === 0) {
+                req.flash('error', "All fields are mandatory");
+                res.redirect("/admin/addquestion");
                 return;
             }
 
-            const data = JSON.parse(JSON.stringify(req.body));
             f = false;
+
+
             await Ques.find({ 'probCode': data.probCode }, (err, res) => {
-                console.log("found -- ", res);
+
                 if (res.length) {
                     req.flash('error', 'problem already in use');
 
@@ -156,7 +185,7 @@ router.route('/addcontest')
 
             // Start Contest Data validation
 
-            var data = JSON.parse(JSON.stringify(req.body));
+            var data = await JSON.parse(JSON.stringify(req.body));
 
             var f = true;
             await Contest.findOne({ 'code': data.code }, (err, res) => {
@@ -368,8 +397,6 @@ router.route('/allprob/query')
                 else if (x < y) return -f;
 
             })
-
-
 
             res.send({
                 obj: all

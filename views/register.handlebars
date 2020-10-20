@@ -22,6 +22,16 @@
   <br /><br />
   <label for="Contact">Contact</label>
   <input type="text" id="contact" name="contact" placeholder="Contact">
+  <br /><br />
+  <label for="mode">Language</label>
+  <select class="selectpicker" data-live-search="true" class="form-control" name="flang" id="mode" onchange="changeMode()">
+              <option value="C" id="C" selected>C</option>
+              <option value="C++" id="C++">C++</option>
+              <option value="Java" id="Java">Java</option>
+              <option value="Python" id="Python">Python</option>
+              <option value="Javascript" id="Javascript">Javasrcipt</option>
+    </select>
+  <input type="text" hidden name="template" placeholder="Contact" value="">
 
   <br/><br/>
 

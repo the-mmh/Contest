@@ -8,7 +8,7 @@ const question = new schema({
     probCode: String,
     probSetter: String,
     probTester: String,
-    statement: String,
+
     score: Number,
     tl: { // Time Limit in sec
         type: Number,

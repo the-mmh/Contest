@@ -1,4 +1,4 @@
-<form action="/admin/addquestion" method="POST">
+<form action="/admin/addquestion" method="POST" enctype="multipart/form-data">
   
 
   <label for="probCode">Problem Code</label>
@@ -11,7 +11,7 @@
   <input type="text" id="probTester" name="probTester">
   <br/>
   <label for="statement">Statement</label>
-  <input type="text" id="statement" name="statement">
+  <input type="file" id="statement" name="statement">
   <br/>
   <label for="numofinputfiles">Number of test files</label>
   <input type="number" id="numofinputfiles" name="numofinputfiles">

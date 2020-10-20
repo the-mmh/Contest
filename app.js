@@ -5,10 +5,14 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const expressHandlebars = require('express-handlebars');
 const flash = require('connect-flash');
+var busboy = require('connect-busboy');
+
+
+
 const session = require('express-session');
 
 const app = express();
-
+app.use(busboy());
 const mongoose = require('mongoose');
 const passport = require('passport');
 // const socketio = require('socket.io');
@@ -23,7 +27,7 @@ mongoose.Promise = global.Promise;
 
 const uri = "mongodb+srv://piyushg9794:passwordnahi@123@contest.j9ls1.mongodb.net/logsn";
 const uri1 = "mongodb://localhost:27017/logsn";
-mongoose.connect(uri, () => console.log("App Db success"))
+mongoose.connect(uri1, () => console.log("App Db success"))
     .catch(err => console.log(err));
 
 app.use(morgan('dev'));

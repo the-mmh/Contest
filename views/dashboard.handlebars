@@ -1,3 +1,13 @@
+<style>
+  #editor {
+    margin: 0;
+    width: 100%;
+    height: 32em;
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+</style>
 
 <div>  
   <h1>Welcome {{username}}</h1>
@@ -12,11 +22,15 @@
             {{contact}}
             
           </div>
+          
           <div id="conedit" class = "col-sm-3" style = "text-align: right;">
             
             <button id="contactedit" onclick="fn()" type="submit">Edit</button>
           </div>
-        </div>
+          
+          </div>
+          <br>
+
         <div class = "row">
           <div class = "col-sm-3" style = "text-align: left;">
             <b>Email: </b>
@@ -25,21 +39,87 @@
             {{email}}
           </div>
         </div>
+        <br>
+         <div class = "row">
+          <div id = "cont" class = "col-sm-3" style = "text-align: left;">
+            <b>Language: </b>
+          </div>
+          <div id = "contl" class = "col-sm-3" style = "text-align: left;">
+            {{flang}}
+            
+          </div>
+          <div id="ledit" class = "col-sm-3" style = "text-align: right;">
+            <button class="btn btn-outline-success" id="tedit" onclick="edit()" type="submit">Edit Template</button>
+             
+          </div>
+
+        </div>
       </div>
       <div class = "col-sm-2" style = "text-align: right;">
         {{#if admin}}
           <a href="/admin">Admin Page</a><br />
         {{/if}}
-        <a href = "/users/{{username}}/submissions/1">Submissions</a>
+        <a href = "/users/submissions/{{username}}/submissions/1">Submissions</a>
       </div>
     </div>
   </div>
+  <div id="edit">
+  </div>
+    <input type="hidden" name="code" id="code" value="{{code}}">
+    <input type="hidden" name="lang" id="lang" value="{{flang}}">
+     <div id="demo"></div>
 </div>
 
-<div id="demo"></div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-themelist.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-c_cpp.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/theme-textmate.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-modelist.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/ace/src/ace.js"></script>
+<script src="/ace/src/ext-modelist.js"></script>
+
+
 <script>
+  var edit = () =>{
+
+    document.getElementById("edit").innerHTML='<select class="selectpicker" data-live-search="true" class="form-control" name="Language" id="mode" onchange="changeMode()">              <option value="C" id="C" selected>C</option>              <option value="C++" id="C++">C++</option>              <option value="Java" id="Java">Java</option>              <option value="Python" id="Python">Python</option>  </select><div id="editor" style="border: solid lightblue;" name="editor" ></div> ';
+    document.getElementById("demo").innerHTML='<button class="btn btn-outline-primary" id="tsave" onclick="editsave()" type="submit">Save</button>';
+    var flang=document.getElementById("lang").value;
+    var code=document.getElementById("code").value;
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/xcode");
+     editor.setOptions({
+    enableBasicAutocompletion: true,
+    enableSnippets: true
+});
+    editor.setShowPrintMargin(false);
+    if(flang){
+    document.getElementById(flang).setAttribute("selected","true");
+      if(flang=='C'||flang=="C++"){
+           editor.session.setMode("ace/mode/c_cpp");
+      }else if(flang=="Java"){
+        editor.session.setMode("ace/mode/java");
+      }else if(flang=="Python"){
+        editor.session.setMode("ace/mode/python3");
+      }        
+    }else{
+      editor.session.setMode("ace/mode/c_cpp");
+    }
+    editor.setValue(code);
+    
+    
+  }
+
+  var editsave = ()=> {
+          var x=editor.getSession().getValue();
+          var y=document.getElementById("lang").value;
+          $.post("/users/edittemp", {flang:y , template:x});
+  }
   
   var fn = () => {
     var x = document.getElementById("contactedit").innerHTML;
@@ -68,5 +148,36 @@
       document.getElementById("concon").innerHTML = x;
     }
   }
+
+    function changeMode() {
+   	var x = document.getElementById("mode");
+    var modeValue = x.options[x.selectedIndex].value;
+    document.getElementById("lang").value = modeValue;
+    if (modeValue == "C") {
+    	editor.session.setMode("ace/mode/c_cpp");
+        editor.clearSelection();
+    }
+    if (modeValue == "C++") {
+    	editor.session.setMode("ace/mode/c_cpp");
+      editor.clearSelection();
+    }
+    if (modeValue == "Java") {
+    	editor.session.setMode("ace/mode/java");
+    	editor.clearSelection();
+    }
+    if(modeValue == "Python") {
+        editor.session.setMode("ace/mode/python3");
+        editor.clearSelection();
+    }
+    
+}
+$(document).ready(function() {
+    $('.selectpicker').selectpicker();
+    $('[data-toggle="tooltip"]').tooltip(); 
+});'
+
+  
+  
+
 </script>
 

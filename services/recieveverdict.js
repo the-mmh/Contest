@@ -5,48 +5,60 @@ var main = require('../app');
 CLOUDAMQP_URL = process.env.CLOUDAMQP_URL;
 
 function recieveverdict() {
-    amqp.connect(CLOUDAMQP_URL, function(error0, connection, req) {
-        if (error0) {
-            throw error0;
-        }
-        console.log('CloudAMQP Connected');
-
-        connection.createChannel(function(error1, channel) {
-            if (error1) {
-                throw error1;
+    try {
+        amqp.connect(CLOUDAMQP_URL, function(error0, connection, req) {
+            if (error0) {
+                throw error0;
             }
+            console.log('CloudAMQP Connected');
 
-            var queue = 'verdict';
-            channel.assertQueue(queue, {
-                durable: true
-            });
+            connection.createChannel(function(error1, channel) {
+                if (error1) {
+                    throw error1;
+                }
 
-            console.log(" [*] Waiting for messages in %s", queue);
-            channel.consume(queue, function(msg) {
+                var queue = 'verdict';
+                channel.assertQueue(queue, {
+                    durable: true
+                });
 
-                var message = msg.content;
+                console.log(" [*] Waiting for messages in %s", queue);
+                try {
+                    channel.consume(queue, function(msg) {
 
-                console.log(" [x] Received %s", message);
-                // await judge.worker(message);
-                message = message.toString();
-                message = message.split(',');
+                        var message = msg.content;
 
-                main.io.emit('change', {
-                        verdict: message[0],
-                        time: message[1],
-                        memory: message[2],
-                        id: message[3]
-                    })
-                    // main.change(message);
+                        console.log(" [x] Received %s", message);
+                        // await judge.worker(message);
+                        message = message.toString();
+                        message = message.split(',');
 
-                console.log("done bhai")
-                channel.ack(msg);
+                        main.io.emit('change', {
+                                verdict: message[0],
+                                time: message[1],
+                                memory: message[2],
+                                id: message[3]
+                            })
+                            // main.change(message);
 
-            }, {
-                noAck: false
+                        console.log("done bhai")
+                        channel.ack(msg);
+
+                    }, {
+                        noAck: false
+                    });
+                } catch (error) {
+                    req.flash('error', "Some error occurred in receiving submission");
+                    res.redirect('/');
+                    return;
+                }
             });
         });
-    });
+    } catch (error) {
+        req.flash('error', "Some error occurred in receiving submission");
+        res.redirect('/');
+        return;
+    }
 }
 
 module.exports.recieveverdict = recieveverdict;

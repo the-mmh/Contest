@@ -21,8 +21,9 @@ const userschema = joi.object().keys({
     password: joi.string().regex(/^([a-zA-Z0-9]+){3,30}$/).required(),
     role: joi.string().required(),
     confirmationPassword: joi.any().valid(joi.ref('password')).required(),
-    contact: joi.string().required()
-
+    contact: joi.string().required(),
+    flang: joi.string().required(),
+    template: joi.string().required()
 });
 
 
@@ -46,7 +47,7 @@ const isNotAuthenticated = (req, res, next) => {
     }
 }
 
-let cUser = "NULL";
+
 
 router.route('/register')
     .get(isNotAuthenticated, (req, res) => {
@@ -127,11 +128,16 @@ router.route('/dashboard')
         if (req.user.role === "admin") {
             admin = true;
         }
+        console.log(req.user.username);
+        console.log(req.user.flang);
         res.render('dashboard', {
             username: req.user.username,
             email: req.user.email,
             contact: req.user.contact,
-            admin: admin
+            admin: admin,
+            flang: req.user.flang,
+            code: req.user.template
+
         });
     });
 
@@ -203,10 +209,10 @@ router.route('/logout')
 router.route('/')
     .post(async(req, res) => {
         var data = await JSON.parse(JSON.stringify(req.body));
-        res.redirect('/users/' + data.username);
+        res.redirect('/users/user/' + data.username);
     })
 
-router.route('/:user')
+router.route('/user/:user')
     .get(async(req, res) => {
         // console.log("came");
         var user = req.params.user;
@@ -228,6 +234,25 @@ router.route('/:user')
         }
     })
 
+// template edit
+router.route('/edittemp')
+    .post(async(req, res) => {
+        if (req.user === undefined) {
+            req.flash('error', 'You must be registered to see this');
+            res.redirect('/users/login');
+            return;
+        }
+        var data = req.body;
+        console.log(data);
+        data = await JSON.parse(JSON.stringify(data));
+        var flang = req.body.flang;
+        var template = req.body.template;
+
+
+        await User.updateOne({ "username": req.user.username }, { $set: { "flang": flang } });
+        await User.updateOne({ "username": req.user.username }, { $set: { "template": template } });
+    });
+// added close
 
 router.route('/edit')
     .post(async(req, res) => {
@@ -244,20 +269,19 @@ router.route('/edit')
         await User.updateOne({ "username": req.user.username }, { $set: { "contact": newcontact } });
     });
 
-
-router.route('/:user/submissions/:page')
+router.route('/submissions/:user/submissions/:page')
     .get(isAuthenticated, async(req, res) => {
         res.render('submissions', {
             user: req.params.user
         })
     });
 
-router.route('/:user/getsub/:page')
+router.route('/submissions/:user/getsub/:page')
     .get(async(req, res) => {
 
         var subs = [],
             res1, user = req.params.user;
-        res1 = await Submission.find({ 'who': user }, 's_id who when which verdict time memory');
+        res1 = await Submission.find({ 'who': user }, 's_id who when which verdict time memory language');
 
         var temp = {};
 
@@ -281,6 +305,7 @@ router.route('/:user/getsub/:page')
             obj.push(res1[i].verdict);
             obj.push(res1[i].time);
             obj.push(res1[i].memory);
+            obj.push(res1[i].language);
             temp[res1[i].when] = obj;
         }
 
@@ -329,7 +354,7 @@ router.route('/:user/getsub/:page')
     });
 
 
-router.route('/:user/:s_id')
+router.route('/usersubmission/:user/:s_id')
     .get(async(req, res) => {
         try {
             var s_id = req.params.s_id,
@@ -347,11 +372,27 @@ router.route('/:user/:s_id')
                 date = allcontest.date,
                 dur = allcontest.duration;
 
+            var ext, lang = userdata.language;
+            console.log(lang);
+            switch (lang) {
+                case 'C++':
+                    ext = ".cpp";
+                    break;
+                case 'Python':
+                    ext = ".py";
+                    break;
+                case 'C':
+                    ext = ".c";
+                    break;
+                case 'Java':
+                    ext = ".java";
+                    break;
+            }
 
             if ((date + dur * 60 * 60 * 1000) < now || (req.user || {}).username === userdata.who) {
-                code = `${(await azure.azurefilesread('submissions', s_id + '.cpp')).toString()}`;
+                code = `${(await azure.azurefilesread('submissions', s_id + ext)).toString()}`;
                 // console.log(code);
-
+                console.log("code");
                 res.render('usersubmission', {
                     code: code,
                     who: userdata.who,
