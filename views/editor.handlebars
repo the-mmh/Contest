@@ -13,7 +13,7 @@
    #editor {
     margin: 0;
     width: 100%;
-    height: 32em;
+    height: 40em;
     margin-top: 5px;
     font-size: 14px;
 }
@@ -97,7 +97,8 @@ User: {{who}}<br />
 Problem Code: {{which}}<br />     
 Code:
 <br /><br />
-
+<button class="btn btn-outline-success" id="tedit" onclick="editsave()" >Save as Template</button>
+<br /><br />
 <form action="/contests/submit/{{which}}" method="POST">
 	<select class="selectpicker" data-live-search="true" class="form-control" name="Language" id="mode" onchange="changeMode()">
               <option value="C" id="C" selected>C</option>
@@ -112,11 +113,14 @@ Code:
               <option value="dark1" >Dark1</option>
               <option value="dark2">Dark2</option>
     </select>  
+    
              <div id="editor" style="border: solid lightblue;" name="editor" onkeyup="funct()"></div>    
              <input type="hidden" name="code" id="code"> 
+             <input type="hidden" name="codet" id="codet" value="{{code}}">
+             <input type="hidden" name="lang" id="lang" value="{{flang}}">   
   
 
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
 <button type="submit" id="compile" class="btn btn-sky text-uppercase btn-sm" value="Submit"> Submit</button>
 </form>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/ace.js" type="text/javascript" charset="utf-8"></script>
@@ -138,12 +142,30 @@ Code:
     var editor = ace.edit("editor");
     editor.setTheme("ace/theme/xcode");
     editor.setShowPrintMargin(false);
-editor.session.setMode("ace/mode/c_cpp");
-editor.setValue("#include <stdio.h>\n\n\nint main() {\n    // Complete the code.\n    return 0;\n}\n");
     editor.setOptions({
     enableBasicAutocompletion: true,
     enableSnippets: true
 });
+ var flang=document.getElementById("lang").value;
+    var code=document.getElementById("codet").value;
+    if(flang){
+    document.getElementById(flang).setAttribute("selected","true");
+      if(flang=='C'||flang=="C++"){
+           editor.session.setMode("ace/mode/c_cpp");
+           editor.clearSelection();
+      }else if(flang=="Java"){
+        editor.session.setMode("ace/mode/java");
+        editor.clearSelection();
+      }else if(flang=="Python"){
+        editor.session.setMode("ace/mode/python3");
+        editor.clearSelection();
+      }
+      editor.setValue(code);        
+    }else{
+editor.session.setMode("ace/mode/c_cpp");
+editor.setValue("#include <stdio.h>\n\n\nint main() {\n    // Complete the code.\n    return 0;\n}\n");}
+
+
     function changet(){
         var y = document.getElementById("theme");
         var x = y.options[y.selectedIndex].value;
@@ -158,9 +180,38 @@ editor.setValue("#include <stdio.h>\n\n\nint main() {\n    // Complete the code.
             editor.setTheme("ace/theme/monokai");
         }
     }
+
+    function editsave() {
+        if(confirm("Do you want to change your template?")){
+    
+    	var xx = document.getElementById("mode");
+    var y = xx.options[xx.selectedIndex].value;
+          var x=editor.getSession().getValue();
+         document.getElementById("lang").value=y;
+         document.getElementById("codet").value=x;
+          $.post("/contests/edittemp", {flang:y , template:x});
+          alert("Your template changed!!!")
+          }else{
+              alert("Template not changed!!!");
+          }
+          
+         
+          
+
+  }
+ 
+
     function changeMode() {
-   	var x = document.getElementById("mode");
+        var flang=document.getElementById("lang").value;
+    var code=document.getElementById("codet").value;
+    var x = document.getElementById("mode");
     var modeValue = x.options[x.selectedIndex].value;
+    if(modeValue==flang){
+      editor.setValue(code);
+    }else{
+      
+    
+   	
     if (modeValue == "C") {
     	editor.session.setMode("ace/mode/c_cpp");
     	editor.setValue("#include <stdio.h>\n\n\nint main() {\n    // Complete the code.\n    return 0;\n}\n");
@@ -171,25 +222,22 @@ editor.setValue("#include <stdio.h>\n\n\nint main() {\n    // Complete the code.
     	editor.session.setMode("ace/mode/c_cpp");
     	editor.setValue("#include <iostream>\nusing namespace std;\n\nint main() {\n    // Complete the code.\n    return 0;\n}\n");
         editor.clearSelection();
-        document.getElementById('langExt').innerHTML = "cpp";
     }
     if (modeValue == "Java") {
     	editor.session.setMode("ace/mode/java");
     	editor.setValue("import java.util.*;\nimport java.lang.*;\nimport java.io.*;\n\nclass Solution{\npublic static void main (String[] args)\n	{\n		// your code goes here\n	}\n}");
         editor.clearSelection();
-        document.getElementById('langExt').innerHTML = "java";
     }
     if(modeValue == "Python") {
         editor.session.setMode("ace/mode/python");
         editor.setValue("# Enter your code here. Read input from STDIN. Print output to STDOUT");
         editor.clearSelection();
-        document.getElementById('langExt').innerHTML = "py";
     }
     if (modeValue == "Javascript") {
     	editor.session.setMode("ace/mode/javascript");
     	editor.setValue("// Enter your code here.");
         editor.clearSelection();
-        document.getElementById('langExt').innerHTML = "js";
+    }
     }
 }
 $(document).ready(function() {

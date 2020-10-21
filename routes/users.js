@@ -28,7 +28,6 @@ const userschema = joi.object().keys({
 
 
 
-
 const isAuthenticated = (req, res, next) => {
     if (req.isAuthenticated()) {
         return next();
@@ -55,14 +54,14 @@ router.route('/register')
     })
     .post(async(req, res, next) => {
         try {
-
             const result = joi.validate(req.body, userschema);
-            // console.log(result);
+
             if (result.error) {
                 req.flash('error', 'invalid data!');
                 res.redirect('/users/register');
                 return;
             }
+
 
             const user = await User.findOne({ 'email': result.value.email }, (err, res) => {
                 if (err) throw err;
@@ -91,10 +90,10 @@ router.route('/register')
 
             delete result.value.confirmationPassword;
             result.value.password = hash;
-            //console.log('new vlaues - ',result.value);
+            // console.log('new vlaues - ', result.value);
 
             const newuser = new User(result.value);
-            //console.log('newuser - ', newuser)
+            // console.log('newuser - ', newuser)
             await newuser.save();
             req.flash('success', 'successfully registered');
 
@@ -128,8 +127,7 @@ router.route('/dashboard')
         if (req.user.role === "admin") {
             admin = true;
         }
-        console.log(req.user.username);
-        console.log(req.user.flang);
+
         res.render('dashboard', {
             username: req.user.username,
             email: req.user.email,
@@ -243,7 +241,6 @@ router.route('/edittemp')
             return;
         }
         var data = req.body;
-        console.log(data);
         data = await JSON.parse(JSON.stringify(data));
         var flang = req.body.flang;
         var template = req.body.template;

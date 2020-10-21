@@ -1,13 +1,17 @@
-<style>
+<style type="text/css" media="screen">
   #editor {
     margin: 0;
     width: 100%;
-    height: 32em;
+    height: 45em;
     margin-top: 5px;
     font-size: 14px;
 }
 
 </style>
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <div>  
   <h1>Welcome {{username}}</h1>
@@ -54,6 +58,7 @@
           </div>
 
         </div>
+        <br>
       </div>
       <div class = "col-sm-2" style = "text-align: right;">
         {{#if admin}}
@@ -86,6 +91,7 @@
 
 <script>
   var edit = () =>{
+    document.getElementById("ledit").innerHTML="";
 
     document.getElementById("edit").innerHTML='<select class="selectpicker" data-live-search="true" class="form-control" name="Language" id="mode" onchange="changeMode()">              <option value="C" id="C" selected>C</option>              <option value="C++" id="C++">C++</option>              <option value="Java" id="Java">Java</option>              <option value="Python" id="Python">Python</option>  </select><div id="editor" style="border: solid lightblue;" name="editor" ></div> ';
     document.getElementById("demo").innerHTML='<button class="btn btn-outline-primary" id="tsave" onclick="editsave()" type="submit">Save</button>';
@@ -102,26 +108,89 @@
     document.getElementById(flang).setAttribute("selected","true");
       if(flang=='C'||flang=="C++"){
            editor.session.setMode("ace/mode/c_cpp");
+           editor.clearSelection();
       }else if(flang=="Java"){
         editor.session.setMode("ace/mode/java");
+        editor.clearSelection();
       }else if(flang=="Python"){
         editor.session.setMode("ace/mode/python3");
+        editor.clearSelection();
       }        
     }else{
       editor.session.setMode("ace/mode/c_cpp");
+      editor.clearSelection();
     }
     editor.setValue(code);
     
     
   }
 
-  var editsave = ()=> {
+  function editsave() {
+    if(confirm("Do you want to change your template?")){
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/xcode");
+    editor.setShowPrintMargin(false);
+    	var xx = document.getElementById("mode");
+    var y = xx.options[xx.selectedIndex].value;
           var x=editor.getSession().getValue();
-          var y=document.getElementById("lang").value;
+         document.getElementById("lang").value=y;
+         document.getElementById("code").value=x;
           $.post("/users/edittemp", {flang:y , template:x});
+          document.getElementById("edit").innerHTML="";
+          document.getElementById("demo").innerHTML="";
+          document.getElementById("ledit").innerHTML='<button class="btn btn-outline-success" id="tedit" onclick="edit()" type="submit">Edit Template</button>';
+          alert("Your template changed!!!");
+          }else{
+            document.getElementById("edit").innerHTML="";
+          document.getElementById("demo").innerHTML="";
+          document.getElementById("ledit").innerHTML='<button class="btn btn-outline-success" id="tedit" onclick="edit()" type="submit">Edit Template</button>';
+          alert("Template not changed!!!");
+          }
   }
+
+  function changeMode() {
+      var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/xcode");
+    editor.setShowPrintMargin(false);
+    
+   	var x = document.getElementById("mode");
+    var modeValue = x.options[x.selectedIndex].value;
+    
+    var flang=document.getElementById("lang").value;
+    var code=document.getElementById("code").value;
+    if(modeValue==flang){
+      editor.setValue(code);
+    }else{
+      if(modeValue=="Python"){
+        editor.setValue("# Enter code here");
+      }else{
+        editor.setValue("// Enter code here");
+      }
+    }
+
+
+    if (modeValue == "C") {
+    	editor.session.setMode("ace/mode/c_cpp");
+        editor.clearSelection();
+    }
+    if (modeValue == "C++") {
+    	editor.session.setMode("ace/mode/c_cpp");
+      editor.clearSelection();
+    }
+    if (modeValue == "Java") {
+    	editor.session.setMode("ace/mode/java");
+    	editor.clearSelection();
+    }
+    if(modeValue == "Python") {
+        editor.session.setMode("ace/mode/python3");
+        editor.clearSelection();
+    }
+    
+}
+
+
   
-  var fn = () => {
+  function fn() {
     var x = document.getElementById("contactedit").innerHTML;
     if(x === "Edit"){
       document.getElementById("contactedit").innerHTML = "Save";
@@ -149,32 +218,8 @@
     }
   }
 
-    function changeMode() {
-   	var x = document.getElementById("mode");
-    var modeValue = x.options[x.selectedIndex].value;
-    document.getElementById("lang").value = modeValue;
-    if (modeValue == "C") {
-    	editor.session.setMode("ace/mode/c_cpp");
-        editor.clearSelection();
-    }
-    if (modeValue == "C++") {
-    	editor.session.setMode("ace/mode/c_cpp");
-      editor.clearSelection();
-    }
-    if (modeValue == "Java") {
-    	editor.session.setMode("ace/mode/java");
-    	editor.clearSelection();
-    }
-    if(modeValue == "Python") {
-        editor.session.setMode("ace/mode/python3");
-        editor.clearSelection();
-    }
     
-}
-$(document).ready(function() {
-    $('.selectpicker').selectpicker();
-    $('[data-toggle="tooltip"]').tooltip(); 
-});'
+
 
   
   

@@ -24,14 +24,15 @@
   <input type="text" id="contact" name="contact" placeholder="Contact">
   <br /><br />
   <label for="mode">Language</label>
-  <select class="selectpicker" data-live-search="true" class="form-control" name="flang" id="mode" onchange="changeMode()">
+  <select class="selectpicker" data-live-search="true" class="form-control" id="mode" onchange="changeMode()">
               <option value="C" id="C" selected>C</option>
               <option value="C++" id="C++">C++</option>
               <option value="Java" id="Java">Java</option>
               <option value="Python" id="Python">Python</option>
               <option value="Javascript" id="Javascript">Javasrcipt</option>
     </select>
-  <input type="text" hidden name="template" placeholder="Contact" value="">
+    <input  type="hidden" name="flang" id="flang" value="C"> 
+  <input  type="hidden" name="template" placeholder="Contact" value=" ">
 
   <br/><br/>
 
@@ -39,6 +40,12 @@
 </form>
 
 <script>
+  function changeMode(){
+    var y = document.getElementById("mode");
+    var x = y.options[y.selectedIndex].value;
+    console.log(x);
+    document.getElementById("flang").value = x;
+  }
   function fn(){
     var x = document.getElementById("inputPassword").value;
     var y = document.getElementById("inputConfirmPassword").value;
@@ -99,4 +106,9 @@
       z.style.color = "green";
     }
   }
+  $(document).ready(function() {
+    $('.selectpicker').selectpicker();
+    $('[data-toggle="tooltip"]').tooltip(); 
+});
+    
 </script>

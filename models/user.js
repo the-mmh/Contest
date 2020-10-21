@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 const bcrypt = require('bcryptjs');
+const { string } = require('joi');
 
 
 const userschema = new schema({
@@ -11,6 +12,9 @@ const userschema = new schema({
     contact: String,
     role: String,
     active: Boolean,
+    flang: String,
+    template: String
+
 
 
 }, {

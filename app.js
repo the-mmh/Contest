@@ -27,7 +27,7 @@ mongoose.Promise = global.Promise;
 
 const uri = "mongodb+srv://piyushg9794:passwordnahi@123@contest.j9ls1.mongodb.net/logsn";
 const uri1 = "mongodb://localhost:27017/logsn";
-mongoose.connect(uri1, () => console.log("App Db success"))
+mongoose.connect(uri, () => console.log("App Db success"))
     .catch(err => console.log(err));
 
 app.use(morgan('dev'));

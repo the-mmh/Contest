@@ -160,6 +160,25 @@ router.route('/queslist')
     }
 })
 
+// template edit
+router.route('/edittemp')
+    .post(async(req, res) => {
+        if (req.user === undefined) {
+            req.flash('error', 'You must be registered to see this');
+            res.redirect('/users/login');
+            return;
+        }
+        var data = req.body;
+        data = await JSON.parse(JSON.stringify(data));
+        var flang = req.body.flang;
+        var template = req.body.template;
+
+
+        await User.updateOne({ "username": req.user.username }, { $set: { "flang": flang } });
+        await User.updateOne({ "username": req.user.username }, { $set: { "template": template } });
+    });
+// added close
+
 
 router.route('/quespage')
 
@@ -273,9 +292,11 @@ router.route('/submit/:probCode')
 
         res.render('editor', {
             who: req.user.username,
-            which: req.params.probCode
+            which: req.params.probCode,
+            flang: req.user.flang,
+            code: req.user.template
         });
-    } else res.render('editor');
+    }
 
 
 })
