@@ -6,9 +6,10 @@ CLOUDAMQP_URL = process.env.CLOUDAMQP_URL;
 
 function recieveverdict() {
     try {
-        amqp.connect(CLOUDAMQP_URL, function(error0, connection, req) {
+        amqp.connect(CLOUDAMQP_URL, function(error0, connection) {
             if (error0) {
                 throw error0;
+
             }
             console.log('CloudAMQP Connected');
 
@@ -39,8 +40,6 @@ function recieveverdict() {
                             time: message[1],
                             memory: message[2],
                             id: message[3]
-                        }, (err) => {
-                            if (err) throw err;
                         });
                         // main.change(message);
 
