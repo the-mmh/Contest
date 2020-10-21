@@ -55,40 +55,18 @@ router.route('/addquestion')
     })
     .post(async(req, res) => {
         try {
-            // if (req.user === undefined) {
-            //     req.flash('error', 'you must be registered and admin');
-            //     res.redirect('/');
-            //     return;
-            // }
-            // if (req.user.role !== "admin") {
-            //     req.flash('error', 'you must be admin');
-            //     res.redirect('/');
-            //     return;
-            // }
-
-
-            var content;
-            req.pipe(req.busboy);
-            req.busboy.on('file', function(fieldname, file, filename) {
-                console.log("Uploading: " + filename);
-                console.log(__dirname);
-                fs.createWriteStream(__dirname + '/' + filename);
-
-
-
-            });
+            if (req.user === undefined) {
+                req.flash('error', 'you must be registered and admin');
+                res.redirect('/');
+                return;
+            }
+            if (req.user.role !== "admin") {
+                req.flash('error', 'you must be admin');
+                res.redirect('/');
+                return;
+            }
 
             const data = await JSON.parse(JSON.stringify(req.body));
-
-
-            // >>>> Statement file to be uploaded here
-            // content is stores in 'content' variable<<<<<,
-            // make a directory named 'probCode'
-            // save file with name 'probCode'+'s'
-
-            // await azure.azurefilescreate('question', filename);
-
-
 
             if ((Object.keys(await JSON.parse(JSON.stringify(req.body)))).length === 0) {
                 req.flash('error', "All fields are mandatory");
@@ -109,10 +87,47 @@ router.route('/addquestion')
                 }
             });
 
+
             if (f) {
                 res.redirect('/admin/addquestion');
                 return;
             }
+
+            // START OF Question upload in cloud
+
+            req.pipe(req.busboy);
+            try {
+                req.busboy.on('file', async function(fieldname, file, filename) {
+                    console.log("Uploading: " + filename);
+                    console.log(__dirname);
+                    var fstream = fs.createWriteStream(__dirname + '/' + filename);
+
+                    var ff = file.pipe(fstream);
+                    ff.on('finish', async() => {
+
+                        var content = fs.readFileSync(__dirname + '/' + filename);
+
+                        var dname = filename.split('.');
+                        dname = dname[0];
+                        filename = dname;
+                        filename += 's.txt';
+
+                        console.log("content -- ", content);
+
+                        await azure.createdirectoryfile('questions', dname, filename, content);
+
+                    })
+                })
+
+
+            } catch (error) {
+                req.flash('error', 'Some error occurred in saving question in cloud');
+                res.redirect('/admin/addquestion');
+                return;
+            }
+
+            //  END OF Question upload in cloud
+
             var arr = Object.keys(data);
             for (var i = 0; i < arr.length; i++) {
                 var key = arr[i];
@@ -145,6 +160,7 @@ router.route('/addquestion')
         } catch (error) {
             req.flash('error', 'Sorry, Some error occured');
             res.redirect('/');
+            throw error;
         }
     });
 

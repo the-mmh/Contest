@@ -7,8 +7,6 @@ const expressHandlebars = require('express-handlebars');
 const flash = require('connect-flash');
 var busboy = require('connect-busboy');
 
-
-
 const session = require('express-session');
 
 const app = express();

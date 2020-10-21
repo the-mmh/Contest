@@ -57,7 +57,18 @@ async function azuresubmissionread(shareName, fileName, path) {
 
 }
 
+async function createdirectoryfile(sharename, directoryname, filename, content) {
+    const directoryClient = serviceClient.getShareClient(sharename).getDirectoryClient(directoryname);
+    await directoryClient.create();
+    const fileClient = directoryClient.getFileClient(filename);
+    await fileClient.create(content.length);
+    console.log(`Create file ${filename} successfully`);
+
+    await fileClient.uploadRange(content, 0, content.length);
+    console.log(`Upload file range "${content}" to ${filename} successfully`);
+}
 
 module.exports.azurefilesread = azurefilesread;
 module.exports.azurefilescreate = azurefilescreate;
+module.exports.createdirectoryfile = createdirectoryfile;
 module.exports.azuresubmissionread = azuresubmissionread;

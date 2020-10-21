@@ -23,8 +23,9 @@ function recieveverdict() {
                 });
 
                 console.log(" [*] Waiting for messages in %s", queue);
-                try {
-                    channel.consume(queue, function(msg) {
+
+                channel.consume(queue, function(msg) {
+                    try {
 
                         var message = msg.content;
 
@@ -34,24 +35,25 @@ function recieveverdict() {
                         message = message.split(',');
 
                         main.io.emit('change', {
-                                verdict: message[0],
-                                time: message[1],
-                                memory: message[2],
-                                id: message[3]
-                            })
-                            // main.change(message);
+                            verdict: message[0],
+                            time: message[1],
+                            memory: message[2],
+                            id: message[3]
+                        }, (err) => {
+                            if (err) throw err;
+                        });
+                        // main.change(message);
 
                         console.log("done bhai")
                         channel.ack(msg);
+                    } catch (error) {
+                        throw error;
+                    }
 
-                    }, {
-                        noAck: false
-                    });
-                } catch (error) {
-                    req.flash('error', "Some error occurred in receiving submission");
-                    res.redirect('/');
-                    return;
-                }
+                }, {
+                    noAck: false
+                });
+
             });
         });
     } catch (error) {
