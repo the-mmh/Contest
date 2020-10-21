@@ -14,7 +14,9 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <div>  
+  <div class="jumbotron" style="width:100%">
   <h1>Welcome {{username}}</h1>
+  </div>
   <div class = "container">
     <div class = "row">
       <div class = "col-sm-10" style = "text-align: left;">
@@ -94,7 +96,7 @@
     document.getElementById("ledit").innerHTML="";
 
     document.getElementById("edit").innerHTML='<select class="selectpicker" data-live-search="true" class="form-control" name="Language" id="mode" onchange="changeMode()">              <option value="C" id="C" selected>C</option>              <option value="C++" id="C++">C++</option>              <option value="Java" id="Java">Java</option>              <option value="Python" id="Python">Python</option>  </select><div id="editor" style="border: solid lightblue;" name="editor" ></div> ';
-    document.getElementById("demo").innerHTML='<button class="btn btn-outline-primary" id="tsave" onclick="editsave()" type="submit">Save</button>';
+    document.getElementById("demo").innerHTML='<button class="btn btn-outline-primary" id="tsave" onclick="editsave()" type="submit">Save</button> <button class="btn btn-outline-secondary"  onclick="cancel()" >Cancel</button>';
     var flang=document.getElementById("lang").value;
     var code=document.getElementById("code").value;
     var editor = ace.edit("editor");
@@ -146,6 +148,12 @@
           document.getElementById("ledit").innerHTML='<button class="btn btn-outline-success" id="tedit" onclick="edit()" type="submit">Edit Template</button>';
           alert("Template not changed!!!");
           }
+  }
+  function cancel(){
+    document.getElementById("edit").innerHTML="";
+          document.getElementById("demo").innerHTML="";
+          document.getElementById("ledit").innerHTML='<button class="btn btn-outline-success" id="tedit" onclick="edit()" type="submit">Edit Template</button>';
+          alert("Template not changed!!!");
   }
 
   function changeMode() {
