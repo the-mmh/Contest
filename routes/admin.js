@@ -4,13 +4,14 @@ const router = express.Router();
 const Ques = require('../models/ques');
 const Contest = require('../models/contest');
 const amqp = require('../services/sendamqp');
-
+const Window = require('window');
 var azure = require('../services/connectazure');
 const url = require('url');
 var app = express();
 var fs = require('fs');
 var busboy = require('connect-busboy');
 app.use(busboy);
+
 
 router.route('/')
     .get(async(req, res) => {
@@ -68,11 +69,13 @@ router.route('/addquestion')
 
             const data = await JSON.parse(JSON.stringify(req.body));
 
-            if ((Object.keys(await JSON.parse(JSON.stringify(req.body)))).length === 0) {
-                req.flash('error', "All fields are mandatory");
-                res.redirect("/admin/addquestion");
-                return;
-            }
+            // if ((Object.keys(await JSON.parse(JSON.stringify(req.body)))).length === 0) {
+            //     req.flash('error', "All fields are mandatory");
+            //     res.redirect("/admin/addquestion");
+            //     return;
+            // }
+
+            // console.log("addcontest -- ", data);
 
             f = false;
 
@@ -93,40 +96,6 @@ router.route('/addquestion')
                 return;
             }
 
-            // START OF Question upload in cloud
-
-            req.pipe(req.busboy);
-            try {
-                req.busboy.on('file', async function(fieldname, file, filename) {
-                    console.log("Uploading: " + filename);
-                    console.log(__dirname);
-                    var fstream = fs.createWriteStream(__dirname + '/' + filename);
-
-                    var ff = file.pipe(fstream);
-                    ff.on('finish', async() => {
-
-                        var content = fs.readFileSync(__dirname + '/' + filename);
-
-                        var dname = filename.split('.');
-                        dname = dname[0];
-                        filename = dname;
-                        filename += 's.txt';
-
-                        console.log("content -- ", content);
-
-                        await azure.createdirectoryfile('questions', dname, filename, content);
-
-                    })
-                })
-
-
-            } catch (error) {
-                req.flash('error', 'Some error occurred in saving question in cloud');
-                res.redirect('/admin/addquestion');
-                return;
-            }
-
-            //  END OF Question upload in cloud
 
             var arr = Object.keys(data);
             for (var i = 0; i < arr.length; i++) {
@@ -142,7 +111,7 @@ router.route('/addquestion')
                 return;
             }
 
-            console.log("data -- ", data);
+            // console.log("data -- ", data);
             var ques = new Ques(data);
             ques.asked = false;
             ques.dateAdded = new Date();
@@ -156,13 +125,180 @@ router.route('/addquestion')
             if (f) {
                 req.flash('success', 'question saved');
             }
-            res.redirect('/admin/addquestion');
+            res.redirect('/admin/uploadstatement');
         } catch (error) {
             req.flash('error', 'Sorry, Some error occured');
             res.redirect('/');
             throw error;
         }
     });
+
+router.route('/admin/validatecode')
+    .post(async(req, res) => {
+
+        var data = await JSON.parse(JSON.stringify(req.body));
+        var ch = await Ques.findOne({ 'probCode': data.code });
+        var val = true;
+        if (ch === null) {
+            val = false;
+        }
+
+        res.send({
+            value: val
+        });
+    })
+
+router.route('/uploadstatement')
+    .get(async(req, res) => {
+        try {
+            if (req.user === undefined) {
+                req.flash('error', 'you must be registered and admin');
+                res.redirect('/');
+                return;
+            }
+            if (req.user.role !== "admin") {
+                req.flash('error', 'you must be admin');
+                res.redirect('/');
+                return;
+            }
+            res.render('uploadstatement1');
+        } catch (error) {
+            req.flash('error', 'Some error occurred');
+            res.redirect('/');
+        }
+    })
+
+router.route('/uploadstatement/:code')
+    .get(async(req, res) => {
+        try {
+            if (req.user === undefined) {
+                req.flash('error', 'you must be registered and admin');
+                res.redirect('/');
+                return;
+            }
+            if (req.user.role !== "admin") {
+                req.flash('error', 'you must be admin');
+                res.redirect('/');
+                return;
+            }
+
+            var code = req.params.code;
+
+            var ch = await Ques.findOne({ 'probCode': code });
+
+            if (ch === null) {
+                req.flash('error', "No problem code found");
+                res.redirect('/admin/uploadstatement');
+                return;
+            }
+
+            await azure.createdirectory('questions', req.params.code);
+            res.render('uploadstatement2', {
+                code: req.params.code
+            });
+        } catch (error) {
+            req.flash('error', 'Some error occurred');
+            res.redirect('/admin/uploadstatement');
+            return;
+        }
+    })
+    .post(busboy({ immediate: true }), async(req, res) => {
+        try {
+
+
+            if (req.user === undefined) {
+                req.flash('error', 'you must be registered and admin');
+                res.redirect('/');
+                return;
+            }
+            if (req.user.role !== "admin") {
+                req.flash('error', 'you must be admin');
+                res.redirect('/');
+                return;
+            }
+            var code = req.params.code;
+
+            var ch = await Ques.findOne({ 'probCode': code });
+
+            if (ch === null) {
+                req.flash('error', "No problem code found");
+                res.redirect('/admin/uploadstatement');
+                return;
+            }
+
+            req.pipe(req.busboy);
+
+            var sharename = 'questions';
+
+
+            console.log("DOne!");
+
+            req.busboy.on('file', (fieldname, file, filename) => {
+                console.log('fieldname -- ', fieldname);
+                if (fieldname === 'statement') {
+                    var content = '';
+                    file.on('data', (data) => {
+                        content += data;
+
+                    }).on('end', async() => {
+
+                        console.log("Checked -- ", filename);
+                        await azure.createdirectoryfile(sharename, code, filename, content);
+                    })
+                } else if (fieldname === 'eitcs') {
+                    var content = '';
+                    file.on('data', (data) => {
+                        content += data;
+                    }).on('end', async() => {
+
+                        console.log("Checked -- ", filename);
+                        await azure.createdirectoryfile(sharename, code, filename, content);
+                    })
+                } else if (fieldname === 'eotcs') {
+                    var content = '';
+                    file.on('data', (data) => {
+                        content += data;
+                    }).on('end', async() => {
+
+                        console.log("Checked -- ", filename);
+                        await azure.createdirectoryfile(sharename, code, filename, content);
+                    })
+                } else if (fieldname === 'itcs') {
+                    var content = '';
+
+                    file.on('data', (data) => {
+                        content += data;
+                    }).on('end', async() => {
+
+                        console.log("Checked -- ", filename);
+                        await azure.createdirectoryfile(sharename, code, filename, content);
+                    })
+                } else if (fieldname === 'otcs') {
+
+                    var content = '';
+                    file.on('data', (data) => {
+                        content += data;
+                    }).on('end', async() => {
+
+                        console.log("Checked -- ", filename);
+                        await azure.createdirectoryfile(sharename, code, filename, content);
+                    })
+                }
+            });
+            req.busboy.on('finish', () => {
+                req.flash('success', "Your files will be uploaded");
+                res.redirect('/admin/uploadstatement');
+            });
+
+
+        } catch (error) {
+            req.flash('error', 'Some error occurred');
+            res.redirect('/admin/uploadstatement');
+            return;
+        }
+    })
+
+
 
 router.route('/addcontest')
     .get(async(req, res) => {

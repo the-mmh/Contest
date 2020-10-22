@@ -1,0 +1,26 @@
+<div id="formstate">
+  <form id = "upload" action="/admin/uploadstatement/{{code}}" method="POST" enctype="multipart/form-data">
+    
+    <div class="form-group">
+      <label class="control-label" for="statement">Statement</label>
+      <input  class="form-control" type="file" id="statement" name="statement">
+    </div>
+    <div class="form-group">
+      <label class="control-label" for="eotcs">Example test cases</label>
+      <input  class="form-control" type="file" id="eitcs" name="eitcs">
+    </div>
+    <div class="form-group">
+      <label class="control-label" for="eotcs">Example test cases</label>
+      <input  class="form-control" type="file" id="eotcs" name="eotcs">
+    </div>
+    <div class="form-group">
+      <label class="control-label" for="itcs">Test Cases</label>
+      <input  class="form-control" type="file" id="itcs" name="itcs" multiple>
+    </div>
+    <div class="form-group">
+      <label class="control-label" for="otcs">Test Cases</label>
+      <input  class="form-control" type="file" id="otcs" name="otcs" multiple>
+    </div>
+    <input class="btn btn-outline-primary" type="submit" value="submit" />
+  </form>
+</div>

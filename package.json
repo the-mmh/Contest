@@ -58,7 +58,8 @@
         "redis": "^3.0.2",
         "socket.io": "^2.3.0",
         "textract": "^2.5.0",
-        "vue-prism-editor": "^1.2.2"
+        "vue-prism-editor": "^1.2.2",
+        "window": "^4.2.7"
     },
     "devDependencies": {},
     "description": ""

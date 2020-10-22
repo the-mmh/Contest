@@ -70,6 +70,8 @@ async function createdirectoryfile(sharename, directoryname, filename, content) 
 async function createdirectory(sharename, directoryname) {
     const directoryClient = serviceClient.getShareClient(sharename).getDirectoryClient(directoryname);
     await directoryClient.create();
+
+    console.log(`Directory ${directoryname} created`);
 }
 
 module.exports.azurefilesread = azurefilesread;

@@ -4,7 +4,7 @@
   }
 </style>
 <h2>Add New Problem</h2>
-<form action="/admin/addquestion" method="POST" enctype="multipart/form-data">
+<form action="/admin/addquestion" method="POST">
   
   <div class="form-group">
   <label class="control-label" for="probCode">Problem Code</label>
@@ -18,10 +18,7 @@
   <label class="control-label" for="probTester">Problem Tester</label>
   <input  class="form-control" type="text" id="probTester" name="probTester">
   </div>
-  <div class="form-group">
-  <label class="control-label" for="statement">Statement</label>
-  <input  class="form-control" type="file" id="statement" name="statement">
- </div>
+  
   <div class="form-group">
   <label class="control-label" for="numofinputfiles">Number of test files</label>
   <input  class="form-control" type="number" id="numofinputfiles" name="numofinputfiles">
@@ -42,7 +39,9 @@
   <label class="control-label" for="ml">Memory Limit in Mega Bytes</label>
   <input  class="form-control" type="number" id="ml" name="ml">
   </div>
-  <input class="btn btn-outline-primary" type="submit" value="submit" />
+  <h5>Note: </h5>Submit to upload statement and test cases
+  <input class="btn btn-outline-primary" type="submit" value="Submit" />
 </form>
+
 
 
