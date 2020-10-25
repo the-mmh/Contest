@@ -196,6 +196,9 @@ const worker = async(pushed, done) => {
             if (error === undefined) {
                 error = "wrong";
             }
+            if (error === "run-timeout") {
+                error = "Time limit exceeded";
+            }
             verdi = error + " in test - " + qno;
             if (score[sub.who][sub.which]["p"] === undefined) {
                 score[sub.who][sub.which]["p"] = 0;
