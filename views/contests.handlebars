@@ -1,9 +1,9 @@
 <div id="cr">
     <h3 id="crcontest">Running Contests</h3>
-    
+    <hr width="100%" color="black" />
     <form action="/contests" method="POST">
         <div id = "crc">
-            <img src="/small.gif" width="90%"/>
+            <img src="/small.gif" width="90%" height = "20%"/>
         </div>
     </form>
     
@@ -13,10 +13,10 @@
 
 <div id="cu">
     <h3>Upcoming Contests</h3>
-
+    <hr width="100%" color="black">
     <form action="/contests" method="POST">
         <div id = "cuc">
-            <img src="/small.gif" width="90%"/>
+            <img src="/small.gif" width="90%" height = "20%"/>
         </div>
     </form>
     
@@ -27,9 +27,10 @@
 
 <div id="cp">
     <h3>Past Contests</h3>
+    <hr width="100%" color="black">
     <form action="/contests" method="POST">
         <div id = "cpc">
-            <img src="/small.gif" width="90%"/>
+            <img src="/small.gif" width="90%" height="20%"/>
         </div>
     </form>
     
@@ -58,9 +59,9 @@
                 if(crc.length>0){
                     var x = '';    
                     for(let i=0;i<crc.length;i++){
-                        x+=('<tr><td style="padding: 5px">'+Number(i+1)+'</td><td style="padding: 5px"><button type="submit" name = "'+crc[i]+'" value = "'+crc[i]+'">'+crc[i]+'</button></td></tr>');
+                        x+=('<tr><td class="text-center" width="20%">'+Number(i+1)+'</td><td class="text-center" width="40%"><button type="submit" name = "'+crc[i]+'" value = "'+crc[i]+'">'+crc[i]+'</button></td><td class="text-center" width="20%">Running</td></tr>');
                     }
-                    cr.append('<table border="1px solid black"><tr><th style="padding: 8px">S. No.</th><th style="padding: 8px">Name</th></tr>' + x + '</table>');
+                    cr.append('<table class="contest-page" width="80%" border="1px solid black"><tr><th class="text-center" width="20%">S. No.</th><th class="text-center" width="40%">Name</th><th class="text-center" width="20%">Status</th></tr>' + x + '</table>');
                     
                 } else {
                     cr.append("No contests available");
@@ -69,9 +70,9 @@
                 if(cuc.length>0){
                     var x = '';    
                     for(let i=0;i<cuc.length;i++){
-                        x+=('<tr><td style="padding: 5px">'+Number(i+1)+'</td><td style="padding: 5px"><button type="submit" name = "'+cuc[i]+'" value = "'+cuc[i]+'">'+cuc[i]+'</button></td></tr>');
+                        x+=('<tr><td class="text-center" width="20%">'+Number(i+1)+'</td><td class="text-center" width="40%"><button type="submit" name = "'+cuc[i]+'" value = "'+cuc[i]+'">'+cuc[i]+'</button></td><td class="text-center" width="20%"></td></tr>');
                     }
-                    cu.append('<table border="1px solid black"><tr><th style="padding: 8px">S. No.</th><th style="padding: 8px">Name</th></tr>' + x + '</table>');
+                    cu.append('<table class="contest-page" width="80%" border="1px solid black"><tr><th class="text-center" width="20%">S. No.</th><th class="text-center" width="40%">Name</th><th class="text-center" width="20%">Status</th></tr>' + x + '</table>');
                 } else {
                     cu.append("No contests available");
                 }
@@ -79,9 +80,9 @@
                 if(cpc.length>0){
                     var x = '';    
                     for(let i=0;i<cpc.length;i++){
-                        x+=('<tr><td style="padding: 5px">'+i+1+'</td><td style="padding: 5px"><button type="submit" name = "'+cpc[i]+'" value = "'+cpc[i]+'">'+cpc[i]+'</button></td></tr>');
+                        x+=('<tr><td class="text-center" width="20%">'+i+1+'</td><td class="text-center" width="40%"><button type="submit" name = "'+cpc[i]+'" value = "'+cpc[i]+'">'+cpc[i]+'</button></td><td class="text-center" width="20%">Ended</td></tr>');
                     }
-                    cp.append('<table border="1px solid black"><tr><th style="padding: 8px">S. No.</th><th style="padding: 8px">Name</th></tr>' + x + '</table>');
+                    cp.append('<table class="contest-page" width="80%" border="1px solid black"><tr><th class="text-center" width="20%">S. No.</th><th class="text-center" class="text-center" width="40%">Name</th><th class="text-center" width="20%">Status</th></tr>' + x + '</table>');
                 } else {
                     cp.append("No contests available");
                 }

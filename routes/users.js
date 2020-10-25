@@ -121,11 +121,15 @@ router.route('/login')
         failureRedirect: '/users/login',
         failureFlash: true
     }));
+
+
 admin = false;
 router.route('/dashboard')
     .get(isAuthenticated, (req, res) => {
         if (req.user.role === "admin") {
             admin = true;
+        } else {
+            admin = false;
         }
 
         res.render('dashboard', {

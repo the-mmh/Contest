@@ -14,10 +14,10 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <div>  
-  <div class="jumbotron" style="width:100%">
-  <h1>Welcome {{username}}</h1>
+  <div style="width:100%;background-color:#e9ecef;padding:20px;margin-bottom:50px;">
+  <h3>Welcome {{username}}</h3>
   </div>
-  <div class = "container">
+  <div class = "container" style="width:90%;">
     <div class = "row">
       <div class = "col-sm-10" style = "text-align: left;">
         <div class = "row">
@@ -54,27 +54,46 @@
             {{flang}}
             
           </div>
-          <div id="ledit" class = "col-sm-3" style = "text-align: right;">
-            <button class="btn btn-outline-success" id="tedit" onclick="edit()" type="submit">Edit Template</button>
-             
-          </div>
 
         </div>
-        <br>
+        <br />
+        
       </div>
       <div class = "col-sm-2" style = "text-align: right;">
         {{#if admin}}
           <a href="/admin">Admin Page</a><br />
         {{/if}}
-        <a href = "/users/submissions/{{username}}/submissions/1">Submissions</a>
+        
       </div>
     </div>
   </div>
-  <div id="edit">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6">
+        <a href = "/users/submissions/{{username}}/submissions/1" style="color:#fff;">
+          <div class = "card bg-dark text-center">
+            <div class="card-body">
+              Submissions
+            </div>
+          </div>
+        </a>
+      </div>
+      <div id="ledit" class = "col-sm-6" style = "text-align: right;">
+        <button id="tedit" onclick="edit()" type="submit" style="color:#fff;width:100%;text-decoration:none;">
+          <div class = "card bg-dark text-center">
+            <div class="card-body">
+              Edit Template
+            </div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="edit" style="margin:20px;">
   </div>
     <input type="hidden" name="code" id="code" value="{{code}}">
     <input type="hidden" name="lang" id="lang" value="{{flang}}">
-     <div id="demo"></div>
+    <div id="demo"></div>
 </div>
 
 
