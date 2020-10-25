@@ -20,6 +20,8 @@ const worker = async(pushed, done) => {
 
         contestSchema = await Contest.findOne({ 'code': sub.ccode });
 
+
+
         if (contestSchema.score === undefined) {
             contestSchema.score = {};
         }
@@ -29,14 +31,7 @@ const worker = async(pushed, done) => {
             score[sub.who] = {};
         }
 
-        await Ques.findOne({ 'probCode': sub.which }, 'numofinputfiles', (err, res) => {
-            if (err) {
-                req.flash("error", "Some error occurred, Inform us if your score is not correct");
-                throw err;
 
-            }
-            numofinputfiles = res.numofinputfiles;
-        })
 
         var flag = 1;
         var qno;
@@ -44,13 +39,14 @@ const worker = async(pushed, done) => {
         var verd = {},
             ut = {};
 
-        await Ques.findOne({ 'probCode': sub.which }, 'tl ml score', (err, res) => {
+        await Ques.findOne({ 'probCode': sub.which }, 'tl ml score numofinputfiles', (err, res) => {
             if (err) {
                 req.flash("error", "Some error occurred, Inform us if your score is not correct");
                 throw err;
 
             }
             ut = res;
+            numofinputfiles = res.numofinputfiles;
         });
 
         function run_test(err, res) {
@@ -108,7 +104,7 @@ const worker = async(pushed, done) => {
         }
 
         for (let i = 0; i < numofinputfiles; i++) {
-
+            console.log("started running");
             const input = `${(await azure.azurefilesread("questions", sub.which + "/" + sub.which + "i_" + (i + 1).toString() + ".txt")).toString()}`;
             const output = `${(await azure.azurefilesread("questions", sub.which + "/" + sub.which + "o_" + (i + 1).toString() + ".txt")).toString()}`;
 
@@ -130,9 +126,12 @@ const worker = async(pushed, done) => {
             });
 
             var sendver = "Running on test case-" + (i + 1).toString();
-
-            var topush = (sendver + ',0,0,' + sub.s_id).toString();
-            amqp.sendverdict(topush);
+            try {
+                var topush = (sendver + ',0,0,' + sub.s_id).toString();
+                amqp.sendverdict(topush);
+            } catch (error) {
+                throw error;
+            }
 
             Submission.updateOne({ "s_id": sub.s_id }, { $set: { "verdict": "Running on test case-" + (i + 1).toString() } }, (err, res) => {
                 if (err) {
@@ -143,23 +142,23 @@ const worker = async(pushed, done) => {
 
             switch (lang) {
                 case 'C++':
-                    await cpp.runFile(path, { stdin: input, timeout: 0 }, (err, res) => {
+                    await cpp.runFile(path, { stdin: input, timeout: (ut.tl * 1000) }, (err, res) => {
                         console.log(res);
                         run_test(err, res);
                     });
                     break;
                 case 'Python':
-                    await python.runFile(path, { stdin: input, timeout: 0 }, (err, res) => {
+                    await python.runFile(path, { stdin: input, timeout: (ut.tl * 5000) }, (err, res) => {
                         run_test(err, res);
                     });
                     break;
                 case 'C':
-                    await c.runFile(path, { stdin: input, timeout: 0 }, (err, res) => {
+                    await c.runFile(path, { stdin: input, timeout: (ut.tl * 1000) }, (err, res) => {
                         run_test(err, res);
                     });
                     break;
                 case 'Java':
-                    await java.runFile(path, { stdin: input, timeout: 0 }, (err, res) => {
+                    await java.runFile(path, { stdin: input, timeout: (ut.tl * 5000) }, (err, res) => {
                         run_test(err, res);
                     });
                     break;
@@ -231,7 +230,12 @@ const worker = async(pushed, done) => {
 
         verd.verdi = verdi;
         var topush = (verdi + ',' + verd.time + ',' + verd.memory + ',' + sub.s_id).toString();
-        amqp.sendverdict(topush);
+
+        try {
+            amqp.sendverdict(topush);
+        } catch (err) {
+            throw err;
+        }
 
         await Submission.updateMany({ "s_id": sub.s_id }, { $set: { "verdict": verd.verdi, 'time': verd.time, 'memory': verd.memory } }, (err, res) => {
             if (err) {
