@@ -21,7 +21,7 @@ router.route('/')
                 res.redirect('/');
                 return;
             }
-            console.log(req.user);
+
             if (req.user.role !== "admin") {
                 req.flash('error', 'you must be admin');
                 res.redirect('/');
@@ -464,7 +464,7 @@ router.route('/allprob')
                 res.redirect('/');
                 return;
             }
-            console.log("1", req.user);
+
             if (req.user.role !== "admin") {
                 req.flash('error', 'you must be admin');
                 res.redirect('/');
@@ -512,7 +512,6 @@ router.route('/allprob/query')
                 res.redirect('/');
                 return;
             }
-            console.log(req.user);
             if (req.user.role !== "admin") {
                 req.flash('error', 'you must be admin');
                 res.redirect('/');
@@ -522,6 +521,8 @@ router.route('/allprob/query')
 
             if (q !== null) {
                 qd = (await JSON.parse(JSON.stringify(q)))["sortby"];
+            } else {
+                qd = "code";
             }
 
             var all = [];

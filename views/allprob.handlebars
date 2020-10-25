@@ -27,13 +27,78 @@
             <th>Details</th>
         </tr>
     </thead>
-    <tbody>
-        
+    <tbody id = "allprobtable">
+        <tr>
+            <td colspan="3">
+                <img src="/image-asset.gif" width="30%" height="30%" style="margin:auto" />
+            </td>
+        </tr>
     </tbody>
+    
 </table>
+<script src="/ajax.js"></script>
+<script>
+    $(document).ready(() => {
 
-
-
-
-<script src="/js/ajax.js"></script>
-
+        $.ajax({
+            url: '/admin/allprob/query',
+            success: function(res) {
+                
+                var x = $('#allprobtable');
+                x.html('');
+                // console.log(res.obj);
+                res.obj.forEach((row) => {
+                    x.append('\
+                            <tr>\
+                            <td>' + row.probCode + '</td>\
+                            <td>' + row.score + '</td>\
+                            <td><a href="/admin/statement/' + row.probCode + '">Click</a></td>\
+                            </tr>\
+                        ');
+                })
+            }
+        })
+    })
+    $(function() {
+        $('#code').on('click', function() {
+            $.ajax({
+                url: '/admin/allprob/query?sortby=code',
+                success: function(res) {
+                    var x = $('tbody');
+                    x.html('');
+                    // console.log(res.obj);
+                    res.obj.forEach((row) => {
+                        x.append('\
+                                <tr>\
+                                <td>' + row.probCode + '</td>\
+                                <td>' + row.score + '</td>\
+                                <td><a href="/admin/statement/' + row.probCode + '">Click</a></td>\
+                                </tr>\
+                            ');
+                    })
+                }
+            })
+        })
+    })
+    $(function() {
+        $('#score').on('click', function() {
+            $.ajax({
+                url: '/admin/allprob/query?sortby=score',
+                success: function(res) {
+                    var x = $('tbody');
+                    x.html('');
+                    // console.log(res.obj);
+                    res.obj.forEach((row) => {
+                        x.append('\
+                                <tr>\
+                                <td>' + row.probCode + '</td>\
+                                <td>' + row.score + '</td>\
+                                <td><a href="/admin/statement/' + row.probCode + '">Click</a></td>\
+                                </tr>\
+                            ');
+                    })
+                }
+            })
+        })
+    })
+</script>

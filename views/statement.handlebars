@@ -58,9 +58,9 @@
 		$.ajax({
             url: '/contests/getprobmain/{{code}}',
             success: function(res) {
-				
+				console.log("1 -- ", res.obj);
                 if(res.obj === undefined){
-					$("#err").append("<h4><b>Note: Statement, input, output not in database!</b></h4>");
+					$("#err").append("<h4><br /><b>Note: Statement, input, output not in database!</b></h4>");
 					return;
 				}
 				
@@ -84,9 +84,9 @@
 			url: '/contests/getprobdetails/{{code}}',
             success: function(res) {
                 
-				
-				if(res.obj == undefined){
-					$("#err").append("Details not in database!");
+				console.log("2 -- ", res);
+				if(res.obj === "null"){
+					$("#err").append("<br /><h4><b>Details not in database!</b></h4>");
 					return;
 				}
 				

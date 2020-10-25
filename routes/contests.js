@@ -244,9 +244,9 @@ router.route('/getprobmain/:probCode')
             final1.statement = `${(await azure.azurefilesread(shareName, fileName+ "s.txt")).toString()}`;
             final1.input = `${(await azure.azurefilesread(shareName, fileName+ "i.txt")).toString()}`;
             final1.output = `${(await azure.azurefilesread(shareName, fileName+ "o.txt")).toString()}`;
-
+            final1 = JSON.stringify(final1);
             res.send({
-                obj: JSON.stringify(final1),
+                obj: final1,
             });
 
         } catch (error) {
