@@ -10,6 +10,9 @@ const Contest = require('../models/contest');
 const Ques = require('../models/ques');
 const randomstring = require('randomstring');
 const request = require('request');
+var nodemailer = require('nodemailer');
+var emailconname = "iiitbloog@gmail.com";
+var emailconpass = "Gaurav@63";
 
 const stream = require('stream');
 
@@ -97,7 +100,30 @@ router.route('/register')
             const newuser = new User(result.value);
             // console.log('newuser - ', newuser)
             await newuser.save();
+
+            var transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: emailconname,
+                    pass: emailconpass
+                }
+            });
+            var mailOptions = {
+                from: emailconname,
+                to: req.body.email,
+                subject: 'Confirmation mail for Bit Legion',
+                text: "Hello " + req.body.username + "\n Here is Secret token for confirmation gmail on IIITBLOOG: \n " + newuser.secretToken
+            };
+            await transporter.sendMail(mailOptions, function(error, info) {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });
+
             req.flash('success', 'successfully registered');
+
 
             if (result.value.role === "admin") {
                 res.redirect('/users/adminverify');
