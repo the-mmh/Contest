@@ -21,28 +21,23 @@
 		justify-content: center;
 	}
 </style>
-
-
-
-	<h5>{{CName}} ({{CCode}})</h5>
 	
 	
-	<div class = "probs">
-		<div class = "sec">
-			
-			<br />
-			<div class="container">
+	<div class = "container">
+		<div class = "row">
+			<div class="col-sm-9" style="border-right: 2px solid #343A40">
 				<h5 align="left" id = "pt"></h5>
-				<div class = "row" id = "list">
+				<div id = "list">
 					<img src="/big.gif" width="100%" />
 				</div>
 			</div>
-		</div>
-		<div class = "sec">
-			<b id = "status"></b>
-			<br />
-			<l id = "rank"></l>
-			<br />
+		
+			<div class = "col-sm-3">
+				<b id = "status"></b>
+				<br />
+				<l id = "rank"></l>
+				<br />
+			</div>
 		</div>
 	</div>
 
@@ -54,9 +49,12 @@
 				console.log(res);
 				$('#pt').html('');
 				$('#pt').append(res.pt);
+				$('#pt').append('<hr color = "black" width="100%" style="margin-left:0px;">');
 				
 				$('#status').html('');
-				$('#status').append(res.CStatus);
+				$('#status').append('<center>'+res.CStatus+'</center>');
+				$('#status').append('<hr color = "black" width="100%">');
+				
 
                 var list = $('#list'), x='';
                 list.html('');
@@ -68,12 +66,12 @@
 					i++;
                 });
 				if(res.CProblems.length>0){
-					list.append('<table><tr><th>S. No.</th><th>Problem</th><th>Time</th><th>Memory</th><th>Score</th></tr>'+x+'</table>');
+					list.append('<table class="quespage-table"><tr><th style="width:10%">S. No.</th><th style="width:70%">Problem</th><th>Time</th><th>Memory</th><th style="width:15%">Score</th></tr>'+x+'</table>');
 				}
 
 				$('#rank').html('');
 				if(res.CProblems.length>0){
-					$('#rank').append('<a id="ranklist" href = "/contests/ranklist/{{CCode}}">Ranklist</a>')
+					$('#rank').append('<center><a id="ranklist" href = "/contests/ranklist/{{CCode}}">Ranklist</a></center>')
 				}
             }
         })

@@ -77,6 +77,24 @@ a.nav-link:before {
     transition: all 0.2s ease-in-out;
 }
 
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+::-webkit-scrollbar-track {
+    background: #fff;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #343A40;
+    transition: all 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #000;
+}
+
 a.nav-link:hover:before {
     visibility: visible;
     transform: scaleX(1);
@@ -111,4 +129,13 @@ a.nav-link:hover:before {
 
 a:hover {
     text-decoration: none !important;
+}
+
+.quespage-table tr td,
+.quespage-table tr th {
+    text-align: center;
+}
+
+.quespage-table tr td {
+    height: 30px;
 }
