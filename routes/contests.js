@@ -558,7 +558,7 @@ router.route('/statusdetails/:page')
 
 
         var page = Number(req.params.page) || 1;
-        var numofsubspage = 15;
+        var numofsubspage = 50;
 
         var last = Math.ceil(subs.length / (numofsubspage));
         var prev = Math.max(page - 1, 1);

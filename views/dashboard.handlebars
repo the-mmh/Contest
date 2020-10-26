@@ -71,7 +71,7 @@
     <div class="row">
       <div class="col-sm-6">
         <a href = "/users/submissions/{{username}}/submissions/1" style="color:#fff;">
-          <div class = "card bg-dark text-center">
+          <div class = "card text-center">
             <div class="card-body">
               Submissions
             </div>
@@ -159,19 +159,19 @@
           $.post("/users/edittemp", {flang:y , template:x});
           document.getElementById("edit").innerHTML="";
           document.getElementById("demo").innerHTML="";
-          document.getElementById("ledit").innerHTML='<button class="btn btn-outline-success" id="tedit" onclick="edit()" type="submit">Edit Template</button>';
+          document.getElementById("ledit").innerHTML='<button id="tedit" onclick="edit()" type="submit" style="color:#fff;width:100%;text-decoration:none;">          <div class = "card bg-dark text-center">            <div class="card-body">              Edit Template            </div>          </div>        </button>';
           alert("Your template changed!!!");
           }else{
             document.getElementById("edit").innerHTML="";
           document.getElementById("demo").innerHTML="";
-          document.getElementById("ledit").innerHTML='<button class="btn btn-outline-success" id="tedit" onclick="edit()" type="submit">Edit Template</button>';
+          document.getElementById("ledit").innerHTML='<button id="tedit" onclick="edit()" type="submit" style="color:#fff;width:100%;text-decoration:none;">          <div class = "card bg-dark text-center">            <div class="card-body">              Edit Template            </div>          </div>        </button>';
           alert("Template not changed!!!");
           }
   }
   function cancel(){
     document.getElementById("edit").innerHTML="";
           document.getElementById("demo").innerHTML="";
-          document.getElementById("ledit").innerHTML='<button class="btn btn-outline-success" id="tedit" onclick="edit()" type="submit">Edit Template</button>';
+          document.getElementById("ledit").innerHTML='<button id="tedit" onclick="edit()" type="submit" style="color:#fff;width:100%;text-decoration:none;">          <div class = "card bg-dark text-center">            <div class="card-body">              Edit Template            </div>          </div>        </button>';
           alert("Template not changed!!!");
   }
 

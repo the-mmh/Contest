@@ -319,7 +319,7 @@ router.route('/submissions/:user/getsub/:page')
 
 
         var page = Number(req.params.page) || 1;
-        var numofsubspage = 15;
+        var numofsubspage = 25;
 
         var last = Math.ceil(subs.length / (numofsubspage));
         var prev = Math.max(page - 1, 1);
