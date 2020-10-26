@@ -4,12 +4,14 @@ const router = express.Router();
 const Ques = require('../models/ques');
 const Contest = require('../models/contest');
 const amqp = require('../services/sendamqp');
-const Window = require('window');
+const schedule = require('node-schedule');
 var azure = require('../services/connectazure');
 const url = require('url');
+
 var app = express();
 var fs = require('fs');
 var busboy = require('connect-busboy');
+const { rankallot } = require('../services/rankallot');
 app.use(busboy);
 
 
@@ -435,10 +437,18 @@ router.route('/addcontest')
             //  Done with Contest Data Validation
 
 
+            var cdate = new Date(cd.getTime() + data.duration * 60 * 60 * 1000 + 2);
+
+            schedule.scheduleJob(cdate, () => {
+                console.log("Started rank allotment");
+                rankallot(data.code);
+            })
+
 
             data.done = false;
             data.score = {};
             await new Contest(data).save();
+
             console.log("Saved");
             req.flash('success', 'Contest Saved Successfully');
             res.redirect('/admin');

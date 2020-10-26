@@ -13,8 +13,10 @@ const userschema = new schema({
     role: String,
     active: Boolean,
     flang: String,
-    template: String
-
+    template: String,
+    rating: Number,
+    allrating: Object,
+    noofcontests: Number
 
 
 }, {

@@ -190,6 +190,9 @@ router.route('/verify')
             }
 
             user.active = true;
+            user.rating = 0;
+            user.allrating = {};
+            user.noofcontests = 0;
             user.secretToken = '';
             await user.save();
             req.flash('success', 'Thank you for registering!');
