@@ -190,7 +190,7 @@ router.route('/verify')
             }
 
             user.active = true;
-            user.rating = 0;
+            user.rating = 1500;
             user.allrating = {};
             user.noofcontests = 0;
             user.secretToken = '';

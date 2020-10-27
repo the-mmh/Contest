@@ -63,12 +63,15 @@ router.route('/contestdetails')
             var crname = [],
                 crcode = [],
                 crdate = [],
+                crdur = [],
                 cename = [],
                 cecode = [],
                 cedate = [],
+                cedur = [],
                 cuname = [],
                 cucode = [],
                 cudate = [],
+                cudur = [],
                 now = Date.now();
 
             for (let i = 0; i < allcontest.length; i++) {
@@ -78,14 +81,17 @@ router.route('/contestdetails')
                     crname.push(allcontest[i].name);
                     crcode.push(allcontest[i].code);
                     crdate.push(allcontest[i].date);
+                    crdur.push(dur);
                 } else if ((date + dur * 60 * 60 * 1000) < now) {
                     cename.push(allcontest[i].name);
                     cecode.push(allcontest[i].code);
                     cedate.push(allcontest[i].date);
+                    cedur.push(dur);
                 } else {
                     cuname.push(allcontest[i].name);
                     cucode.push(allcontest[i].code);
                     cudate.push(allcontest[i].date);
+                    cudur.push(dur);
                 }
             }
 
@@ -93,12 +99,15 @@ router.route('/contestdetails')
                 CRName: crname,
                 CRCode: crcode,
                 CRDate: crdate,
+                crdur: crdur,
                 CPName: cename,
                 CPCode: cecode,
                 CPDate: cedate,
+                cpdur: cedur,
                 CUName: cuname,
                 CUCode: cucode,
                 CUDate: cudate,
+                cudur: cudur,
             });
         } catch (error) {
             req.flash('error', 'Some error occurred');
@@ -245,6 +254,8 @@ router.route('/getprobmain/:probCode')
             final1.input = `${(await azure.azurefilesread(shareName, fileName+ "i.txt")).toString()}`;
             final1.output = `${(await azure.azurefilesread(shareName, fileName+ "o.txt")).toString()}`;
             final1 = JSON.stringify(final1);
+
+            console.log(final1);
             res.send({
                 obj: final1,
             });

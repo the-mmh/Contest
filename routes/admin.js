@@ -40,16 +40,16 @@ router.route('/')
 router.route('/addquestion')
     .get(async(req, res) => {
         try {
-            // if (req.user === undefined) {
-            //     req.flash('error', 'you must be registered and admin');
-            //     res.redirect('/');
-            //     return;
-            // }
-            // if (req.user.role !== "admin") {
-            //     req.flash('error', 'you must be admin');
-            //     res.redirect('/');
-            //     return;
-            // }
+            if (req.user === undefined) {
+                req.flash('error', 'you must be registered and admin');
+                res.redirect('/');
+                return;
+            }
+            if (req.user.role !== "admin") {
+                req.flash('error', 'you must be admin');
+                res.redirect('/');
+                return;
+            }
             res.render('addquestion');
         } catch (error) {
             req.flash('error', 'Sorry, Some error occurred');
