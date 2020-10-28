@@ -30,8 +30,9 @@ async function azurefilesread(shareName, fileName) {
     const downloadFileResponse = await fileClient.download();
     const txt = `${(
     await streamToBuffer(downloadFileResponse.readableStreamBody)
-  ).toString()}`;
+  ).toString().trim()}`;
     console.log(txt);
+    console.log("type -- ", typeof txt);
     return txt;
 }
 

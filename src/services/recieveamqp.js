@@ -6,7 +6,7 @@ CLOUDAMQP_URL = process.env.CLOUDAMQP_URL;
 function recieveamqp() {
     amqp.connect(CLOUDAMQP_URL, function(error0, connection) {
         if (error0) {
-            req.flash('error', "Some error occurred in receiving submission");
+
             throw error0;
         }
         console.log('CloudAMQP Connected');
@@ -35,7 +35,7 @@ function recieveamqp() {
                     noAck: false
                 });
             } catch (error) {
-                req.flash('error', "Some error occurred in receiving submission");
+                throw error;
 
             }
         });

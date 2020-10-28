@@ -56,6 +56,7 @@ const worker = async(pushed, done) => {
                 verd.time = 0;
                 verd.memory = 0;
             } else {
+                res.memoryUsage = Math.abs(res.memoryUsage);
                 console.log("\nREsSSS\n", res);
                 useroutput = res.stdout;
                 if (verd.time === undefined) {
@@ -143,7 +144,6 @@ const worker = async(pushed, done) => {
             switch (lang) {
                 case 'C++':
                     await cpp.runFile(path, { stdin: input, timeout: (ut.tl * 1000) }, (err, res) => {
-                        console.log(res);
                         run_test(err, res);
                     });
                     break;
@@ -173,7 +173,14 @@ const worker = async(pushed, done) => {
                 });
             }
 
-            if (useroutput.toString().trim() !== output || flag === 0) {
+            console.log("Correct output --");
+            console.log(output);
+
+            console.log("user output -- ");
+            console.log(useroutput.toString().trim());
+            console.log("flag\n", flag);
+            if (useroutput.toString().trim() !== output.toString().trim() || flag === 0) {
+                console.log("Got Wrong");
                 flag = 0;
                 qno = i + 1;
                 break;
@@ -197,7 +204,7 @@ const worker = async(pushed, done) => {
                 error = "wrong";
             }
             if (error === "run-timeout") {
-                error = "Time limit exceeded";
+                error = "TLE";
             }
             verdi = error + " in test - " + qno;
             if (score[sub.who][sub.which]["p"] === undefined) {

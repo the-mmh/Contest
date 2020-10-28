@@ -7,26 +7,29 @@ function sendverdict(msg) {
         if (err) {
             throw err;
         }
+        try {
+            connection.createChannel(function(error1, channel) {
+                if (error1) {
+                    throw error1;
+                }
 
-        connection.createChannel(function(error1, channel) {
-            if (error1) {
-                throw error1;
-            }
-
-            var queue = 'verdict';
-            channel.assertQueue(queue, {
-                durable: true
+                var queue = 'verdict';
+                channel.assertQueue(queue, {
+                    durable: true
+                });
+                try {
+                    channel.sendToQueue(queue, Buffer.from(msg), { persistent: true });
+                    console.log(" [x] Sent %s", msg);
+                } catch (error) {
+                    throw error;
+                }
             });
-            try {
-                channel.sendToQueue(queue, Buffer.from(msg), { persistent: true });
-                console.log(" [x] Sent %s", msg);
-            } catch (error) {
-                next(error);
-            }
-        });
-        setTimeout(function() {
-            connection.close();
-        }, 500);
+            setTimeout(function() {
+                connection.close();
+            }, 500);
+        } catch (error) {
+            throw error;
+        }
     });
 }
 
