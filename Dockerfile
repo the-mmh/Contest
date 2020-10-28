@@ -4,7 +4,7 @@ RUN apt-get update
 RUN apt-get install g++
 RUN apt-get install gcc
 RUN apt-get install python
-RUN apt-get install openjdk-8-jre Y
+RUN apt-get install -y openjdk-8-jre
 COPY package.json /app
 RUN npm install
 COPY . /app
