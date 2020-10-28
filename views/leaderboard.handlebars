@@ -1,0 +1,131 @@
+<table style="width: 90%" class="tableleaderboard">
+    <thead>
+        <tr>
+            <th>
+                Rank
+            </th>
+            <th>
+                Username
+            </th>
+            <th>
+                Rating
+            </th>
+        </tr>
+    </thead>
+    <tbody id="leaderboardbody">
+        
+    </tbody>
+</table>
+
+<center id = "loaders">
+    <img src="/image-asset.gif" />
+</center>
+
+<br />
+<div id="leadPagination">
+    
+</div>
+
+
+<br />
+Displaying <z id="noofres"></z> results per page<br />
+<br />
+Page <z id="lpages"></z> of <z id="llasts"></z>
+<br />
+
+
+<script>
+    $(document).ready(function(){
+        var cp = window.location.pathname;
+        cp = cp.toString().trim();
+        cp = cp.split('/');
+        cp = cp[cp.length-1];
+        console.log(cp);
+		$.ajax({
+            
+            url: '/users/getleaderboard/'+cp,
+            success: function(res) {
+                console.log("abcd");
+                console.log(res);
+
+                var body = $("#leaderboardbody");
+                body.html('');
+                var userdata = res.userdata;
+                var rankarray = res.rankarray;
+                for (let i = 0; i < userdata.length; i++) {
+                    body.append('<tr>\
+                        <td>'+rankarray[i]+'</td>\
+                        <td>'+userdata[i].username+'</td>\
+                        <td>'+userdata[i].rating+'</td>\
+                    </tr>')
+                }
+
+
+                var sp = $("#leadPagination"), lo = $("#loaders");
+                sp.html('');
+                lo.empty();
+
+
+
+                if(res.checkp){
+                    if(res.checkm){
+                        sp.append('\
+                            <ul class="pagination justify-content-center">\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/1" value="1"> First </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/'+res.prev+'" value="'+res.prev+'"> Prev </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/'+res.midp+'" value="'+res.midp+'"> '+res.midp+' </a></li>\
+                                <li class="page-item active"><a class="page-link" href = "/users/leaderboard/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/'+res.next+'" value="'+res.next+'"> Next; </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/'+res.mid+'" value="'+res.mid+'"> '+res.mid+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/'+res.last+'" value="'+res.last+'"> Last </a></li>\
+                            </ul>\
+                        ');
+                    } else {
+                        sp.append('\
+                            <ul class="pagination justify-content-center">\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/1" value="1"> First </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/'+res.prev+'" value="'+res.prev+'"> Prev </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/'+res.midp+'" value="'+res.midp+'"> '+res.midp+' </a></li>\
+                                <li class="page-item active"><a class="page-link" href = "/users/leaderboard/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/'+res.next+'" value="'+res.next+'"> Next </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/'+res.last+'" value="'+res.last+'"> Last </a></li>\
+                            </ul>\
+                        ');
+                    }
+                } else {
+                    if(res.checkm){
+                        sp.append('\
+                            <ul class="pagination justify-content-center">\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/1" value="1"> First </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/'+res.prev+'" value="'+res.prev+'"> Prev </a></li>\
+                                <li class="page-item active"><a class="page-link" href = "/users/leaderboard/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/'+res.next+'" value="'+res.next+'"> Next </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/'+res.mid+'" value="'+res.mid+'"> '+res.mid+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/'+res.last+'" value="'+res.last+'"> Last </a></li>\
+                            </ul>\
+                        ');
+                    } else {
+                        sp.append('\
+                            <ul class="pagination justify-content-center">\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/1" value="1"> First </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/'+res.prev+'" value="'+res.prev+'"> Prev </a></li>\
+                                <li class="page-item active"><a class="page-link" href = "/users/leaderboard/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/'+res.next+'" value="'+res.next+'"> Next </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/leaderboard/'+res.last+'" value="'+res.last+'"> Last </a></li>\
+                            </ul>\
+                        ');
+                    }
+                }
+
+                $("#noofres").html('');
+                $("#llasts").html('');
+                $("#lpages").html('');
+
+                $("#noofres").append(res.nos);
+                $("#llasts").append(res.last);
+                $("#lpages").append(res.page);
+
+            }
+        })
+    })
+</script>

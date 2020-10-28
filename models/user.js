@@ -15,8 +15,7 @@ const userschema = new schema({
     flang: String,
     template: String,
     rating: Number,
-    allrating: Object,
-    noofcontests: Number
+    allrating: Object
 
 
 }, {

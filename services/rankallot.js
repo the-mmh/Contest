@@ -2,15 +2,20 @@ const schedule = require('node-schedule');
 const Contest = require('../models/contest');
 const User = require('../models/user');
 
-var rankallot = async(code) => {
-
+async function rankallot(code) {
+    console.log("Check 1", code);
     var contest = {},
         scores = [],
         pC = [],
         cpC = {},
-        partusers = {};
+        partusers = {},
+        condate;
 
     contest = await Contest.find({ 'code': code });
+
+    console.log("Check 2");
+
+    condate = contest[0].date;
 
     if (contest[0].score) {
 
@@ -23,14 +28,21 @@ var rankallot = async(code) => {
             }
         }
         contest = contest[0].score;
-
-        Object.keys(contest).forEach(async(k) => {
+        console.log("Check 3");
+        Object.keys(contest).forEach((k) => {
             var arr = {};
             arr.rank = (contest[k]["rank"]);
 
             arr.username = (k);
 
-            partusers.k = await User.findOne({ 'username': scores[i]['username'] }, 'noofcontests allrating rating');
+            User.findOne({ 'username': k }, 'allrating rating', (err, res) => {
+                if (err) throw err;
+
+
+                partusers[k] = res;
+
+
+            });
 
             arr.score = (contest[k]["score"]);
 
@@ -55,6 +67,9 @@ var rankallot = async(code) => {
 
     }
 
+    console.log("Check 4");
+
+
     if (scores.length > 0) {
         scores.sort((a, b) => {
             if (a["score"] < b["score"]) return 1;
@@ -65,32 +80,47 @@ var rankallot = async(code) => {
             else if (a["username"] > b["username"]) return -1;
         });
 
+
         for (let i = 0; i < scores.length; i++) {
-            var cuser = await User.findOne({ 'username': scores[i]['username'] }, 'noofcontests allrating rating');
+            var cuser;
+
+            cuser = await User.findOne({ 'username': scores[i]['username'] }, 'allrating rating');
 
             var newrating, oldrating = cuser.rating,
                 s = 0,
-                n = scores.length;
+                n = scores.length,
+                x = 400;
             var obtrank = Number(i + 1);
-            Object.keys(partusers).forEach(async(user) => {
+
+            Object.keys(partusers).forEach((user) => {
                 if (scores[i]['username'] !== user) {
-                    var p = 1 / (1 + Math.pow(cuser.rating - partusers.user['rating']));
+
+                    var po = Math.pow(10, (-cuser.rating + partusers[user]['rating']) / x);
+                    po += 1;
+                    po = 1 / po;
+                    var p = po;
                     s += p;
                 }
+
+
             })
+
 
             var exprank = n - s;
 
-            newrating = oldrating + (x / n) * (exprank - obtrank);
+            newrating = Math.floor(oldrating + (x / n) * (exprank - obtrank));
 
-            cuser.noofcontests += 1;
-            cuser.allrating[code] = {
+
+            cuser['allrating'][condate] = {
+                'code': code,
                 'rank': obtrank,
                 'oldrating': cuser.rating,
                 'newrating': newrating
             }
-            await User.updateOne({ 'username': scores[i]['username'] }, { $set: { rating: cuser.allrating[code]['newrating'], noofcontests: cuser.noofcontests, allrating: cuser.allrating } }, (err, res) => {
+
+            await User.updateOne({ 'username': scores[i]['username'] }, { $set: { rating: newrating, allrating: cuser.allrating } }, (err) => {
                 if (err) throw err;
+                console.log(scores[i]['username'], cuser);
             });
         }
     }

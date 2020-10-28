@@ -153,12 +153,33 @@ router.route('/login')
 
 admin = false;
 router.route('/dashboard')
-    .get(isAuthenticated, (req, res) => {
+    .get(isAuthenticated, async(req, res) => {
         if (req.user.role === "admin") {
             admin = true;
         } else {
             admin = false;
         }
+
+        var allrating = await User.findOne({ 'username': req.user.username }, 'allrating');
+
+        console.log('allrating -- ', allrating['allrating']);
+
+        var dates = Object.keys(allrating['allrating']);
+
+        dates.sort((a, b) => {
+            if (a < b) return 1;
+            else return 0;
+        });
+
+        console.log('keys -- ', dates);
+
+        var tosend = [];
+        allrating = allrating['allrating'];
+        for (let i = 0; i < Math.min(dates.length, 5); i++) {
+            tosend.push(allrating[dates[i]]);
+        }
+
+        console.log("tosend -- ", tosend);
 
         res.render('dashboard', {
             username: req.user.username,
@@ -166,8 +187,9 @@ router.route('/dashboard')
             contact: req.user.contact,
             admin: admin,
             flang: req.user.flang,
-            code: req.user.template
-
+            code: req.user.template,
+            crating: req.user.rating,
+            ratingdata: tosend
         });
     });
 
@@ -453,5 +475,78 @@ router.route('/usersubmission/:user/:s_id')
         }
 
     })
+
+
+router.route('/leaderboard/:page')
+    .get(async(req, res) => {
+        res.render('leaderboard');
+    })
+
+router.route('/getleaderboard/:page')
+    .get(async(req, res) => {
+
+        userdata = await User.find({}, 'username rating');
+        console.log("userdata -- ", userdata);
+        userdata.sort((a, b) => {
+            if (a['rating'] < b['rating']) return 1;
+            else if (a['rating'] > b['rating']) return -1;
+            else if (a['username'] > b['username']) return 1;
+            else return -1;
+        });
+        console.log("sorted -- ", userdata);
+        var z = 1;
+        var rankarray = [];
+        rankarray.push(z);
+
+        for (let i = 1; i < userdata.length; i++) {
+            z++;
+            if (userdata[i - 1]['rating'] === userdata[i]['rating'] && userdata[i - 1]['username'] === userdata[i]['username']) {
+                rankarray.push(rankarray[i - 1]);
+            } else {
+                rankarray.push(z);
+            }
+        }
+
+        console.log("with rank -- ");
+        for (let i = 0; i < userdata.length; i++) {
+            console.log(userdata[i].username, rankarray[i]);
+        }
+        var page = Number(req.params.page) || 1;
+        var numofrespage = Math.min(userdata.length, 25);
+
+        var last = Math.ceil(userdata.length / (numofrespage));
+        var prev = Math.max(page - 1, 1);
+        var next = Math.min(page + 1, last);
+        var mid = Math.floor((page + last) / 2);
+        var midp = Math.floor((page + 1) / 2);
+
+        var f = 1;
+        var i1, i2;
+        i1 = (Math.max((page - 1), 0) * (numofrespage));
+        i2 = i1 + numofrespage;
+
+        var checkm = true,
+            checkp = true;
+
+        if (midp === page) checkp = false;
+        if (mid === page) checkm = false;
+
+        res.send({
+            userdata: userdata.slice(i1, i2),
+            rankarray: rankarray.slice(i1, i2),
+            prev: prev,
+            mid: mid,
+            midp: midp,
+            next: next,
+            first: f,
+            checkp: checkp,
+            checkm: checkm,
+            last: last,
+            page: page,
+            nos: numofrespage,
+        })
+
+    })
+
 
 module.exports = router, isAuthenticated, isNotAuthenticated;

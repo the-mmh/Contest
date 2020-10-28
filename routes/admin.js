@@ -437,12 +437,12 @@ router.route('/addcontest')
             //  Done with Contest Data Validation
 
 
-            var cdate = new Date(cd.getTime() + data.duration * 60 * 60 * 1000 + 2);
+            var cdate = new Date(cd.getTime() + data.duration * 60 * 60 * 1000 + 5 * 1000 * 60);
 
             schedule.scheduleJob(cdate, () => {
                 console.log("Started rank allotment");
                 rankallot(data.code);
-            })
+            });
 
 
             data.done = false;

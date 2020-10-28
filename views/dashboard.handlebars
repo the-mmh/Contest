@@ -46,13 +46,23 @@
           </div>
         </div>
         <br>
-         <div class = "row">
+        <div class = "row">
           <div id = "cont" class = "col-sm-3" style = "text-align: left;">
             <b>Language: </b>
           </div>
           <div id = "contl" class = "col-sm-3" style = "text-align: left;">
             {{flang}}
             
+          </div>
+
+        </div>
+        <br />
+        <div class = "row">
+          <div id = "rating" class = "col-sm-3" style = "text-align: left;">
+            <b>Rating: </b>
+          </div>
+          <div id = "ratingvalue" class = "col-sm-3" style = "text-align: left;">
+            {{crating}}
           </div>
 
         </div>
@@ -67,6 +77,8 @@
       </div>
     </div>
   </div>
+
+
   <div class="container" style="margin-top:20px">
     <div class="row">
       <div class="col-sm-6">
@@ -91,10 +103,30 @@
   </div>
   <div id="edit" style="margin:20px;">
   </div>
-    <input type="hidden" name="code" id="code" value="{{code}}">
-    <input type="hidden" name="lang" id="lang" value="{{flang}}">
-    <div id="demo"></div>
+  <input type="hidden" name="code" id="code" value="{{code}}">
+  <input type="hidden" name="lang" id="lang" value="{{flang}}">
+  <div id="demo"></div>
+
+  <center>
+    <table class="performance" border="1px solid #000">
+      <tr>
+        <th>Contest Code</th>
+        <th>Rank</th>
+        <th>oldrating</th>
+        <th>Newrating</th>
+      </tr>
+      {{#each ratingdata}}
+        <td>{{this.code}}</td>
+        <td>{{this.rank}}</td>
+        <td>{{this.oldrating}}</td>
+        <td>{{this.newrating}}</td>
+      {{/each}}
+    </table>
+  </center>
+
 </div>
+
+
 
 
 
