@@ -13,6 +13,7 @@ const request = require('request');
 var nodemailer = require('nodemailer');
 var emailconname = "iiitbloog@gmail.com";
 var emailconpass = "Gaurav@63";
+var userupdate = "https://iiitp-blog.herokuapp.com/updateUser";
 
 const stream = require('stream');
 
@@ -59,6 +60,7 @@ router.route('/register')
     })
     .post(async(req, res, next) => {
         try {
+            request(userupdate);
             const result = joi.validate(req.body, userschema);
 
             if (result.error) {
@@ -201,8 +203,9 @@ router.route('/verify')
         res.render('verify');
     })
     .post(async(req, res, next) => {
-        try {
 
+        try {
+            request(userupdate);
             const { secretToken } = req.body;
             const user = await User.findOne({ 'secretToken': secretToken });
             if (!user) {
