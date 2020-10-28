@@ -28,7 +28,8 @@ const userschema = joi.object().keys({
     confirmationPassword: joi.any().valid(joi.ref('password')).required(),
     flang: joi.string().required(),
     template: joi.string().required(),
-    mis: joi.string().required()
+    mis: joi.string().required(),
+    contact: joi.string().required()
 });
 
 
@@ -116,40 +117,47 @@ router.route('/register')
                 result.value.password = hash;
                 // console.log('new vlaues - ', result.value);
 
+
+                try {
+                    var transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                            user: emailconname,
+                            pass: emailconpass
+                        }
+                    });
+                    var mailOptions = {
+                        from: emailconname,
+                        to: req.body.email,
+                        subject: 'Confirmation mail for Bit Legion',
+                        text: "Hello " + req.body.username + "\n Here is Secret token for confirmation gmail on IIITBLOOG: \n " + newuser.secretToken
+                    };
+                    await transporter.sendMail(mailOptions, function(error, info) {
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            console.log('Email sent: ' + info.response);
+                        }
+                    });
+                } catch (error) {
+                    req.flash('error', 'Looks like mail doesn"t exist, contact administrator for queries');
+                    res.redirect('/users/register');
+                    return;
+                }
+
                 const newuser = new User(result.value);
                 // console.log('newuser - ', newuser)
                 await newuser.save();
 
-                var transporter = nodemailer.createTransport({
-                    service: 'gmail',
-                    auth: {
-                        user: emailconname,
-                        pass: emailconpass
-                    }
-                });
-                var mailOptions = {
-                    from: emailconname,
-                    to: req.body.email,
-                    subject: 'Confirmation mail for Bit Legion',
-                    text: "Hello " + req.body.username + "\n Here is Secret token for confirmation gmail on IIITBLOOG: \n " + newuser.secretToken
-                };
-                await transporter.sendMail(mailOptions, function(error, info) {
-                    if (error) {
-                        console.log(error);
-                    } else {
-                        console.log('Email sent: ' + info.response);
-                    }
-                });
-
                 req.flash('success', 'successfully registered');
                 request(userupdate);
 
-                if (result.value.role === "admin") {
-                    res.redirect('/users/adminverify');
-                    return;
-                } else {
-                    res.redirect('/users/verify');
-                }
+                // if (result.value.role === "admin") {
+                //     res.redirect('/users/adminverify');
+                //     return;
+                // } else {
+                res.redirect('/users/verify');
+                // }
             } else {
                 req.flash('error', 'Register using IIITP provided email id');
                 res.redirect('/users/register');
