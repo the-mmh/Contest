@@ -1,6 +1,7 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const User = require('../models/user');
+const bcrypt = require('bcryptjs');
 
 passport.serializeUser((user, done) => {
     // console.log("user -- ", user);
@@ -30,17 +31,31 @@ passport.use('local', new LocalStrategy({
                 return done(null, false, { message: "Unknown user" });
             }
         }
-        const isValid = User.comparePasswords(password, user.password);
-        if (!isValid) {
-            return done(null, false, { message: "unknown password" });
-
-        }
 
         if (!user.active) {
             return done(null, false, { message: "You haven't verified email yet" });
         }
 
-        return done(null, user);
+        var res = await bcrypt.compare(password, user.password);
+
+
+        if (!res) {
+            return done(null, false, { message: "incorrect password" });
+        } else {
+            return done(null, user);
+        }
+
+
+        // if (!isValid) {
+
+
+        // }
+
+
+
+
+
+
     } catch (error) {
         return done(error, false);
     }

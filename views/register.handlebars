@@ -19,13 +19,11 @@
   <label class="control-label" for="inputUsername">Username:</label>
   <input class="form-control" type="text" id="inputUsername" name="username" placeholder="Username">
   </div>
-  <div class="form-group">
-  <label class="control-label" for="role">Role:</label>
-  <select class="form-control" name="role" id="role">
-    <option value="user">User</option>
-    <option value="admin">Admin</option>
-  </select>
-  </div>
+  
+ 
+   <input type="text" hidden name="role" id="role" value="User">
+    
+  
 <div class="form-group">
   <label  class="control-label" for="inputPassword">Password:</label>
   <input class="form-control" type="password" onkeyup="fn1()" id="inputPassword" name="password" placeholder="Password">
@@ -41,6 +39,10 @@
   <input class="form-control" type="text" id="contact" name="contact" placeholder="Contact">
   </div>
   <div class="form-group">
+  <label class="control-label" for="Contact">MIS:</label>
+  <input class="form-control" type="text" id="mis" name="mis" placeholder="mis">
+  </div>
+  <div class="form-group">
 
   <label class="control-label" for="mode">Language:</label>
   <select class="form-control selectpicker" data-live-search="true" id="mode" onchange="changeMode()">
@@ -48,7 +50,6 @@
               <option value="C++" id="C++">C++</option>
               <option value="Java" id="Java">Java</option>
               <option value="Python" id="Python">Python</option>
-              <option value="Javascript" id="Javascript">Javasrcipt</option>
     </select>
 
      </div>

@@ -10,6 +10,7 @@ const userschema = new schema({
     password: String,
     secretToken: String,
     contact: String,
+    mis: String,
     role: String,
     active: Boolean,
     flang: String,

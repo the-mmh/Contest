@@ -26,9 +26,9 @@ const userschema = joi.object().keys({
     password: joi.string().regex(/^([a-zA-Z0-9]+){3,30}$/).required(),
     role: joi.string().required(),
     confirmationPassword: joi.any().valid(joi.ref('password')).required(),
-    contact: joi.string().required(),
     flang: joi.string().required(),
-    template: joi.string().required()
+    template: joi.string().required(),
+    mis: joi.string().required()
 });
 
 
@@ -69,70 +69,93 @@ router.route('/register')
                 return;
             }
 
-
-            const user = await User.findOne({ 'email': result.value.email }, (err, res) => {
-                if (err) throw err;
-            });
-            if (user) {
-
-                req.flash('error', 'email already exist!');
-                res.redirect('/users/register');
-                return;
-            }
-
-            const usern = await User.findOne({ 'username': result.value.username });
-
-            if (usern) {
-                req.flash('error', 'username already exist!');
-                res.redirect('/users/register');
-                return;
-            }
-
-            const hash = await User.hashPassword(result.value.password)
-                //console.log('hash', hash);
-
-            const secretToken = randomstring.generate()
-            result.value.secretToken = secretToken;
-            result.value.active = false;
-
-            delete result.value.confirmationPassword;
-            result.value.password = hash;
-            // console.log('new vlaues - ', result.value);
-
-            const newuser = new User(result.value);
-            // console.log('newuser - ', newuser)
-            await newuser.save();
-
-            var transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: emailconname,
-                    pass: emailconpass
+            var checkemail = '',
+                bodyemail = result.value.email,
+                f = 0;
+            for (let i = 0; i < bodyemail.length; i++) {
+                if (f === 1) {
+                    checkemail += bodyemail[i];
                 }
-            });
-            var mailOptions = {
-                from: emailconname,
-                to: req.body.email,
-                subject: 'Confirmation mail for Bit Legion',
-                text: "Hello " + req.body.username + "\n Here is Secret token for confirmation gmail on IIITBLOOG: \n " + newuser.secretToken
-            };
-            await transporter.sendMail(mailOptions, function(error, info) {
-                if (error) {
-                    console.log(error);
+                if (bodyemail[i] === '@') {
+                    f = 1;
+                }
+
+            }
+            console.log('checkemail -- ', checkemail);
+            if (checkemail === 'cse.iiitp.ac.in' || checkemail === 'ece.iiitp.ac.in' || checkemail === 'iiitp.ac.in') {
+
+
+
+
+                const user = await User.findOne({ 'email': result.value.email }, (err, res) => {
+                    if (err) throw err;
+                });
+                if (user) {
+
+                    req.flash('error', 'email already exist!');
+                    res.redirect('/users/register');
+                    return;
+                }
+
+                const usern = await User.findOne({ 'username': result.value.username });
+
+                if (usern) {
+                    req.flash('error', 'username already exist!');
+                    res.redirect('/users/register');
+                    return;
+                }
+
+                const hash = await User.hashPassword(result.value.password)
+                    //console.log('hash', hash);
+
+                const secretToken = randomstring.generate()
+                result.value.secretToken = secretToken;
+                result.value.active = false;
+
+                delete result.value.confirmationPassword;
+                result.value.password = hash;
+                // console.log('new vlaues - ', result.value);
+
+                const newuser = new User(result.value);
+                // console.log('newuser - ', newuser)
+                await newuser.save();
+
+                var transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: emailconname,
+                        pass: emailconpass
+                    }
+                });
+                var mailOptions = {
+                    from: emailconname,
+                    to: req.body.email,
+                    subject: 'Confirmation mail for Bit Legion',
+                    text: "Hello " + req.body.username + "\n Here is Secret token for confirmation gmail on IIITBLOOG: \n " + newuser.secretToken
+                };
+                await transporter.sendMail(mailOptions, function(error, info) {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        console.log('Email sent: ' + info.response);
+                    }
+                });
+
+                req.flash('success', 'successfully registered');
+                request(userupdate);
+
+                if (result.value.role === "admin") {
+                    res.redirect('/users/adminverify');
+                    return;
                 } else {
-                    console.log('Email sent: ' + info.response);
+                    res.redirect('/users/verify');
                 }
-            });
-
-            req.flash('success', 'successfully registered');
-
-
-            if (result.value.role === "admin") {
-                res.redirect('/users/adminverify');
-                return;
             } else {
-                res.redirect('/users/verify');
+                req.flash('error', 'Register using IIITP provided email id');
+                res.redirect('/users/register');
+                return;
             }
+
 
         } catch (error) {
             next(error);
@@ -164,7 +187,6 @@ router.route('/dashboard')
 
         var allrating = await User.findOne({ 'username': req.user.username }, 'allrating');
 
-        console.log('allrating -- ', allrating['allrating']);
 
         var dates = Object.keys(allrating['allrating']);
 
@@ -173,7 +195,6 @@ router.route('/dashboard')
             else return 0;
         });
 
-        console.log('keys -- ', dates);
 
         var tosend = [];
         allrating = allrating['allrating'];
@@ -181,7 +202,12 @@ router.route('/dashboard')
             tosend.push(allrating[dates[i]]);
         }
 
-        console.log("tosend -- ", tosend);
+
+        var participation = false;
+
+        if (tosend.length > 0) {
+            participation = true;
+        }
 
         res.render('dashboard', {
             username: req.user.username,
@@ -191,7 +217,9 @@ router.route('/dashboard')
             flang: req.user.flang,
             code: req.user.template,
             crating: req.user.rating,
-            ratingdata: tosend
+            ratingdata: tosend,
+            mis: req.user.mis,
+            participation: participation
         });
     });
 
@@ -272,22 +300,50 @@ router.route('/')
 
 router.route('/user/:user')
     .get(async(req, res) => {
-        // console.log("came");
+
         var user = req.params.user;
 
-        if (req.user) {
+        if (req.user !== undefined) {
+
             if (req.user.username === user) {
                 res.redirect('/users/dashboard');
                 return;
             }
         }
         var userdata = await User.findOne({ 'username': user });
+
         if (userdata === null) {
             res.render('usernotfound');
         } else {
+
+
+            var tosend = [];
+
+            var allrating = userdata.allrating;
+
+            var dates = Object.keys(allrating);
+
+            dates.sort((a, b) => {
+                if (a < b) return 1;
+                else return 0;
+            });
+
+
+            for (let i = 0; i < Math.min(dates.length, 5); i++) {
+                tosend.push(allrating[dates[i]]);
+            }
+
+            var participation = false;
+
+            if (tosend.length > 0) {
+                participation = true;
+            }
             res.render('profile', {
-                user: user,
-                contact: userdata.contact
+                username: userdata.username,
+                mis: userdata.mis,
+                rating: userdata.rating,
+                userdata: tosend,
+                participation: participation
             })
         }
     })
@@ -310,6 +366,39 @@ router.route('/edittemp')
         await User.updateOne({ "username": req.user.username }, { $set: { "template": template } });
     });
 // added close
+
+//
+router.route('/report')
+    .get((req, res) => {
+        res.render("report");
+    })
+    .post(async(req, res) => {
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: emailconname,
+                pass: emailconpass
+            }
+        });
+        var mailOptions = {
+            from: emailconname,
+            to: "sarthak.igupta7379@gmail.com",
+            subject: 'plag Report for Bit Legion',
+            text: "Submission: " + req.body.suba + "\nMatched Submission: \n " + req.body.subb
+        };
+        await transporter.sendMail(mailOptions, function(error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email sent: ' + info.response);
+            }
+            0
+        });
+        res.redirect("/");
+    })
+
+
+//
 
 router.route('/edit')
     .post(async(req, res) => {
@@ -426,8 +515,9 @@ router.route('/usersubmission/:user/:s_id')
 
 
             var now = Date.now(),
-                date = allcontest.date,
-                dur = allcontest.duration;
+                date = allcontest[0].date,
+
+                dur = allcontest[0].duration;
 
             var ext, lang = userdata.language;
             console.log(lang);
@@ -446,7 +536,8 @@ router.route('/usersubmission/:user/:s_id')
                     break;
             }
 
-            if ((date + dur * 60 * 60 * 1000) < now || (req.user || {}).username === userdata.who) {
+
+            if ((date.getTime() + dur * 60 * 60 * 1000) < now || (req.user || {}).username === userdata.who) {
                 code = `${(await azure.azurefilesread('submissions', s_id + ext)).toString()}`;
                 // console.log(code);
                 console.log("code");
@@ -488,32 +579,38 @@ router.route('/leaderboard/:page')
 router.route('/getleaderboard/:page')
     .get(async(req, res) => {
 
-        userdata = await User.find({}, 'username rating');
-        console.log("userdata -- ", userdata);
+        var userdata1 = await User.find({}, 'username rating allrating');
+
+        var userdata = [];
+        for (let i = 0; i < userdata1.length; i++) {
+            var keys = Object.keys(userdata1[i].allrating);
+            if (keys.length !== 0) {
+                userdata.push(userdata1[i]);
+            }
+
+        }
+
+
         userdata.sort((a, b) => {
             if (a['rating'] < b['rating']) return 1;
             else if (a['rating'] > b['rating']) return -1;
             else if (a['username'] > b['username']) return 1;
             else return -1;
         });
-        console.log("sorted -- ", userdata);
+
         var z = 1;
         var rankarray = [];
         rankarray.push(z);
 
         for (let i = 1; i < userdata.length; i++) {
             z++;
-            if (userdata[i - 1]['rating'] === userdata[i]['rating'] && userdata[i - 1]['username'] === userdata[i]['username']) {
+            if (userdata[i - 1]['rating'] === userdata[i]['rating']) {
                 rankarray.push(rankarray[i - 1]);
             } else {
                 rankarray.push(z);
             }
         }
 
-        console.log("with rank -- ");
-        for (let i = 0; i < userdata.length; i++) {
-            console.log(userdata[i].username, rankarray[i]);
-        }
         var page = Number(req.params.page) || 1;
         var numofrespage = Math.min(userdata.length, 25);
 

@@ -55,7 +55,7 @@ Page <z id="lpages"></z> of <z id="llasts"></z>
                 for (let i = 0; i < userdata.length; i++) {
                     body.append('<tr>\
                         <td>'+rankarray[i]+'</td>\
-                        <td>'+userdata[i].username+'</td>\
+                        <td><a href="/users/user/'+userdata[i].username+'" />'+userdata[i].username+'</a></td>\
                         <td>'+userdata[i].rating+'</td>\
                     </tr>')
                 }
