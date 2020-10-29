@@ -116,36 +116,30 @@ router.route('/register')
                 delete result.value.confirmationPassword;
                 result.value.password = hash;
                 // console.log('new vlaues - ', result.value);
-
                 const newuser = new User(result.value);
-                try {
-                    var transporter = nodemailer.createTransport({
-                        service: 'gmail',
-                        auth: {
-                            user: emailconname,
-                            pass: emailconpass
-                        }
-                    });
-                    var mailOptions = {
-                        from: emailconname,
-                        to: req.body.email,
-                        subject: 'Confirmation mail for Bit Legion',
-                        text: "Hello " + req.body.username + "\n Here is Secret token for confirmation gmail on IIITBLOOG: \n " + newuser.secretToken
-                    };
-                    await transporter.sendMail(mailOptions, function(error, info) {
-                        if (error) {
-                            console.log(error);
-                        } else {
-                            console.log('Email sent: ' + info.response);
-                        }
-                    });
-                } catch (error) {
-                    req.flash('error', 'Looks like mail doesn"t exist, contact administrator for queries');
-                    res.redirect('/users/register');
-                    return;
-                }
 
-                
+                var transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: emailconname,
+                        pass: emailconpass
+                    }
+                });
+                var mailOptions = {
+                    from: emailconname,
+                    to: req.body.email,
+                    subject: 'Confirmation mail for Bit Legion',
+                    text: "Hello " + req.body.username + "\n Here is Secret token for confirmation gmail on IIITBLOOG: \n " + newuser.secretToken
+                };
+                await transporter.sendMail(mailOptions, function(error, info) {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        console.log('Email sent: ' + info.response);
+                    }
+                });
+
+
                 // console.log('newuser - ', newuser)
                 await newuser.save();
 
@@ -590,6 +584,7 @@ router.route('/getleaderboard/:page')
         var userdata1 = await User.find({}, 'username rating allrating');
 
         var userdata = [];
+
         for (let i = 0; i < userdata1.length; i++) {
             if (userdata1[i]) {
                 if (userdata1[i].allrating) {
@@ -603,15 +598,12 @@ router.route('/getleaderboard/:page')
         }
 
 
-        if(userdata.length>0){
-        
-            userdata.sort((a, b) => {
-                if (a['rating'] < b['rating']) return 1;
-                else if (a['rating'] > b['rating']) return -1;
-                else if (a['username'] > b['username']) return 1;
-                else return -1;
-            });
-        }
+        userdata.sort((a, b) => {
+            if (a['rating'] < b['rating']) return 1;
+            else if (a['rating'] > b['rating']) return -1;
+            else if (a['username'] > b['username']) return 1;
+            else return -1;
+        });
 
         var z = 1;
         var rankarray = [];
