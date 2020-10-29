@@ -1,0 +1,114 @@
+<br />
+
+<div id = "err"></div>
+
+<h3 id = "probCode">Problem Code</h3>
+<p id = "probCodec"></p>
+<br />
+
+
+<h3 id = "state">Problem Statement</h3>
+<z id = "statec"></z>
+<br />
+
+<h3 id = "inp">Input</h3>
+<z id = "inpc"></z>
+<br />
+
+<h3 id = "out">Output</h3>
+<z id = "outc"></z>
+<br />
+
+<br />
+<br />
+
+<h4 id = "set">Problem Setter</h4>
+<z id = "setc"></z>
+<br />
+
+<h4 id = "test">Problem Tester</h4>
+<z id = "testc"></z>
+<br />
+
+<h4 id = "datea">Date Added</h4>
+<z id = "datec"></z>
+<br />
+
+<h4 id = "tl">Time Limit</h4>
+<z id = "tlc"></z>
+<br />
+
+<h4 id = "ml">Memory Limit</h4>
+<z id = "mlc"></z>
+<br />
+
+<h4 id = "sco">Score</h4>
+<z id = "scoc"></z>
+<br />
+<br />
+
+<script>
+	
+            
+	
+	$(document).ready(function(){
+		
+		var path = '/contests/getprobmain/{{code}}';
+		console.log(path);
+		$.ajax({
+            url: '/contests/getprobmain/{{code}}',
+            success: function(res) {
+				console.log("1 -- ", res.obj);
+                if(res.obj === undefined){
+					$("#err").append("<h4><br /><b>Note: Statement, input, output not in database!</b></h4>");
+					return;
+				}
+				
+				var data = JSON.parse(res.obj);
+				
+				$("#statec").html('');
+				$("#statec").append(data.statement);
+				$("#inpc").html('');
+				$("#inpc").append(data.input);
+				$("#outc").html('');
+				$("#outc").append(data.output);
+				
+            
+            }
+        });
+		
+	});
+
+	$(document).ready(function(){
+		$.ajax({
+			url: '/contests/getprobdetails/{{code}}',
+            success: function(res) {
+                
+				console.log("2 -- ", res);
+				if(res.obj === "null"){
+					$("#err").append("<br /><h4><b>Details not in database!</b></h4>");
+					return;
+				}
+				
+				var data = JSON.parse(res.obj);
+				
+				$("#probCodec").html('');
+				$("#probCodec").append(data.probCode);
+				$("#setc").html('');
+				$("#setc").append(data.probSetter);
+				$("#testc").html('');
+				$("#testc").append(data.probSetter);
+				$("#datec").html('');
+				$("#datec").append(data.dateAdded);
+				$("#tlc").html('');
+				$("#tlc").append(data.tl);
+				$("#mlc").html('');
+				$("#mlc").append(data.ml);
+				$("#scoc").html('');
+				$("#scoc").append(data.score);
+            }
+        });
+	});
+	
+	
+</script>

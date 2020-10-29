@@ -1,0 +1,48 @@
+
+
+<label class="control-label" for="probCode">Problem Code</label>
+<input  class="form-control" type="text" id="probCode" name="probCode">
+<button type="submit" onclick="load()" value = "Check">Check</button>
+
+<p id = "status"></p>
+
+
+<script>
+
+  function ChangeUrl(title, url) {  
+    if (typeof(history.pushState) != "undefined") {  
+        var obj = { Title: title, Url: url };  
+        history.pushState(obj, obj.Title, obj.Url);  
+    } else {  
+        alert("Browser does not support HTML5.");  
+    }  
+  }  
+  
+  function load() {
+    $("#demo").append(document.getElementById('probCode').value);
+    $("#status").html('');
+    $("#status").append('<img src="/roll.gif" width="70px" height="70px" />');
+    var code = document.getElementById('probCode').value;
+    $.ajax({
+      type: "POST",
+      url: 'admin/validatecode',
+      data: {code: code},
+      success: (res) => {
+        console.log(res);
+        
+        res = res.value;
+        if(res === true){
+          $("#status").html('');
+          $("#status").html('Code is valid');
+          
+          document.getElementById('status').style.color="green";
+          window.location.href+=('/'+code);
+        } else {
+          $("#status").html('Code is not valid');
+          document.getElementById('status').style.color="red";
+        }
+      }
+    })
+  }
+
+</script>

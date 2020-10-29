@@ -1,0 +1,13 @@
+<style>
+    .navca{
+        margin:10px;
+    }
+</style>
+
+<a class="navca" href="/contests/quespage">Problems</a>
+{{#if isAuthenticated}}
+    <a class="navca" href="/users/submissions/{{user}}/submissions/1">Submissions</a>
+{{/if}}
+<a class="navca" href="/contests/status/1">Status</a>
+
+<hr color="black" width="100%" style="margin-left:0px" />

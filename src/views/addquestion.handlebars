@@ -1,0 +1,47 @@
+<style>
+  .form-control{
+    width:50%
+  }
+</style>
+<h2>Add New Problem</h2>
+<form action="/admin/addquestion" method="POST">
+  
+  <div class="form-group">
+  <label class="control-label" for="probCode">Problem Code</label>
+  <input  class="form-control" type="text" id="probCode" name="probCode">
+  </div>
+  <div class="form-group">
+  <label class="control-label" for="probSetter">Problem Setter</label>
+  <input  class="form-control" type="text" id="probSetter" name="probSetter">
+  </div>
+  <div class="form-group">
+  <label class="control-label" for="probTester">Problem Tester</label>
+  <input  class="form-control" type="text" id="probTester" name="probTester">
+  </div>
+  
+  <div class="form-group">
+  <label class="control-label" for="numofinputfiles">Number of test files</label>
+  <input  class="form-control" type="number" id="numofinputfiles" name="numofinputfiles">
+  </div>
+  <div class="form-group">
+  <label class="control-label" for="numofexfiles">Number of example files</label>
+  <input  class="form-control" type="number" id="numofexfiles" name="numofexfiles">
+  </div>
+  <div class="form-group">
+  <label class="control-label" for="score">Score</label>
+  <input  class="form-control" type="number" id="score" name="score">
+  </div>
+  <div class="form-group">
+  <label class="control-label" for="tl">Time limit in seconds</label>
+  <input  class="form-control" type="number" id="tl" name="tl">
+  </div>
+  <div class="form-group">
+  <label class="control-label" for="ml">Memory Limit in Mega Bytes</label>
+  <input  class="form-control" type="number" id="ml" name="ml">
+  </div>
+  <h5>Note: </h5>Submit to upload statement and test cases
+  <input class="btn btn-outline-primary" type="submit" value="Submit" />
+</form>
+
+
+

@@ -1,0 +1,72 @@
+
+<html>
+  <head>
+    <style>
+      body{
+        overflow-y: scroll;
+      }
+    </style>
+    <title>BiT Legion</title>
+
+    
+    <script src="/js/jquerycdn.min.js"></script>
+    <script src="/js/jqueryajax.min.js"></script>
+    <script src = "/public/js/ajax.js"></script>
+
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+  </head>
+  
+   
+
+  <body>
+    {{#if success_messages }}
+      <div class="alert alert-success">{{success_messages}}</div>
+    {{/if}}
+    {{#if error_messages }}
+      <div class="alert alert-danger">{{error_messages}}</div>
+    {{/if}}
+    
+    {{> navbar}}
+
+    
+    <div class="container body" style="width:80%; box-shadow: 0px 0px 8px grey; padding: 50px; overflow-x:scroll">
+      
+      {{{body}}}
+
+      <div class="servertime">
+        <p id = "st"></p>
+      </div>
+
+    </div>
+
+    <center class ="footer" style="color:#afafaf">
+     Copyright &#169; IIIT Pune 2020-2030<br /> A Project by <span style="color:white;font-size: 15px;">Sarthak Gupta</span> , <span style="color:white;font-size: 15px;">Piyush Gupta</span> and <span style="color:white;font-size: 15px;">Gaurav Lathwal</span>
+    </center>
+
+    
+    <script src="/js/ajaxpopper.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    
+
+    <script>
+      var upd = setInterval(()=>{
+        var cd = new Date();
+        console.log(cd);
+        cd = cd.toString();
+        cd = cd.split(" GMT");
+        document.getElementById('st').innerHTML = cd[0]+"<br />"+"GMT"+cd[1];
+      }, 500);
+
+      var x = $(".body");
+      x.css("min-height", screen.height);
+
+
+
+    </script>
+
+  </body>
+
+  
+</html>

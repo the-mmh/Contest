@@ -1,0 +1,252 @@
+
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Editor</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <style type="text/css" media="screen">
+    
+
+   #editor {
+    margin: 0;
+    width: 100%;
+    height: 40em;
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+/*Compile Button CSS*/
+
+.btn{
+    margin: 4px;
+    box-shadow: 1px 1px 5px #888888;
+}
+
+.btn-sky {
+	color: #fff;
+	background-color: #0bacd3;
+	border-bottom:2px solid #098aa9;
+}
+
+.btn-sky:hover,.btn-sky.active:focus, .btn-sky:focus{
+	color: #fff;
+	background-color: #29b6d8;
+	border-bottom:2px solid #2192ad;
+	outline: none;
+}
+
+.btn-sky:active, .btn-sky.active {
+	color: #fff;
+	background-color: #0a97b9;
+	border-top:2px solid #087994;
+	outline-offset: none;
+	margin-top: 2px;
+}
+
+.btn-sky.active:focus{
+	color: #fff;
+	background-color: #df6a78;
+	border-bottom:2px solid #b25560;
+	outline: none;
+}
+
+.btn:focus,
+.btn:active:focus,
+.btn.active:focus {
+    outline: none;
+    outline-offset: 0px;
+}
+
+/*Compile Button CSS End*/
+
+.col-md-12.col-sm-12.codeSide {
+    background: #272822;
+    height: 40em;
+    padding-left: 21px;
+    border-radius: 10px;
+    padding-top: 7px;
+}
+
+.ace_gutter {
+    min-width: 50px;
+}
+
+.ace_scroller {
+	margin-left: 5px;
+}
+
+input#compile {
+    margin-top: 5px;
+    float: right;
+}
+
+/*Language Select CSS */
+button.btn.dropdown-toggle.btn-default {
+    width: 42%;
+    margin: 4px 2px 6px 4px;
+}
+
+  </style>
+
+	<div class="container">
+		 <!-- add code here for quetion id -->
+User: {{who}}<br />
+Problem Code: {{which}}<br />     
+Code:
+<br /><br />
+<button class="btn btn-outline-success" id="tedit" onclick="editsave()" >Save as Template</button>
+<br /><br />
+<form action="/contests/submit/{{which}}" method="POST">
+	<select class="selectpicker" data-live-search="true" class="form-control" name="Language" id="mode" onchange="changeMode()">
+              <option value="C" id="C" selected>C</option>
+              <option value="C++" id="C++">C++</option>
+              <option value="Java" id="Java">Java</option>
+              <option value="Python" id="Python">Python</option>
+    </select>
+    <select class="selectpicker" data-live-search="true" class="form-control" name="theme" id="theme" onchange="changet()">
+              <option value="light1"  selected>Light1</option>
+              <option value="light2" >Light2</option>
+              <option value="dark1" >Dark1</option>
+              <option value="dark2">Dark2</option>
+    </select>  
+    
+             <div id="editor" style="border: solid lightblue;" name="editor" onkeyup="funct()"></div>    
+             <input type="hidden" name="code" id="code"> 
+             <input type="hidden" name="codet" id="codet" value="{{code}}">
+             <input type="hidden" name="lang" id="lang" value="{{flang}}">   
+  
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+<button type="submit" id="compile" class="btn btn-sky text-uppercase btn-sm" value="Submit"> Submit</button>
+</form>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-themelist.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-c_cpp.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/theme-textmate.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-modelist.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/ace/src/ace.js"></script>
+<!-- load ace modelist extension -->
+<script src="/ace/src/ext-modelist.js"></script>
+
+<script>
+    function funct(){
+        var x=editor.getSession().getValue();
+
+        document.getElementById("code").value = x ;
+       
+    }
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/xcode");
+    editor.setShowPrintMargin(false);
+    editor.setOptions({
+    enableBasicAutocompletion: true,
+    enableSnippets: true
+});
+ var flang=document.getElementById("lang").value;
+    var code=document.getElementById("codet").value;
+    if(flang){
+    document.getElementById(flang).setAttribute("selected","true");
+      if(flang=='C'||flang=="C++"){
+           editor.session.setMode("ace/mode/c_cpp");
+           editor.clearSelection();
+      }else if(flang=="Java"){
+        editor.session.setMode("ace/mode/java");
+        editor.clearSelection();
+      }else if(flang=="Python"){
+        editor.session.setMode("ace/mode/python3");
+        editor.clearSelection();
+      }
+      editor.setValue(code);        
+    }else{
+editor.session.setMode("ace/mode/c_cpp");
+editor.setValue("#include <stdio.h>\n\n\nint main() {\n    // Complete the code.\n    return 0;\n}\n");}
+
+
+    function changet(){
+        var y = document.getElementById("theme");
+        var x = y.options[y.selectedIndex].value;
+        if(x=="light1"){
+            editor.setTheme("ace/theme/xcode");
+        }else if(x=="dark1"){
+            editor.setTheme("ace/theme/twilight");
+        }else if(x=="light2"){
+            editor.setTheme("ace/theme/textmate");
+        }
+        else if(x=="dark2"){
+            editor.setTheme("ace/theme/monokai");
+        }
+    }
+
+    function editsave() {
+        if(confirm("Do you want to change your template?")){
+    
+    	var xx = document.getElementById("mode");
+    var y = xx.options[xx.selectedIndex].value;
+          var x=editor.getSession().getValue();
+         document.getElementById("lang").value=y;
+         document.getElementById("codet").value=x;
+          $.post("/contests/edittemp", {flang:y , template:x});
+          alert("Your template changed!!!")
+          }else{
+              alert("Template not changed!!!");
+          }
+          
+         
+          
+
+  }
+ 
+
+    function changeMode() {
+        var flang=document.getElementById("lang").value;
+    var code=document.getElementById("codet").value;
+    var x = document.getElementById("mode");
+    var modeValue = x.options[x.selectedIndex].value;
+    if(modeValue==flang){
+      editor.setValue(code);
+    }else{
+      
+    
+   	
+    if (modeValue == "C") {
+    	editor.session.setMode("ace/mode/c_cpp");
+    	editor.setValue("#include <stdio.h>\n\n\nint main() {\n    // Complete the code.\n    return 0;\n}\n");
+        editor.clearSelection();
+        document.getElementById('langExt').innerHTML = "c";
+    }
+    if (modeValue == "C++") {
+    	editor.session.setMode("ace/mode/c_cpp");
+    	editor.setValue("#include <iostream>\nusing namespace std;\n\nint main() {\n    // Complete the code.\n    return 0;\n}\n");
+        editor.clearSelection();
+    }
+    if (modeValue == "Java") {
+    	editor.session.setMode("ace/mode/java");
+    	editor.setValue("import java.util.*;\nimport java.lang.*;\nimport java.io.*;\n\nclass Solution{\npublic static void main (String[] args)\n	{\n		// your code goes here\n	}\n}");
+        editor.clearSelection();
+    }
+    if(modeValue == "Python") {
+        editor.session.setMode("ace/mode/python");
+        editor.setValue("# Enter your code here. Read input from STDIN. Print output to STDOUT");
+        editor.clearSelection();
+    }
+    if (modeValue == "Javascript") {
+    	editor.session.setMode("ace/mode/javascript");
+    	editor.setValue("// Enter your code here.");
+        editor.clearSelection();
+    }
+    }
+}
+$(document).ready(function() {
+    $('.selectpicker').selectpicker();
+    $('[data-toggle="tooltip"]').tooltip(); 
+});
+    
+</script>
+
+
+
+</div>
+

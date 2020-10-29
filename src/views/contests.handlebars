@@ -1,0 +1,107 @@
+<div id="cr">
+    <h3 id="crcontest">Running Contests</h3>
+    <hr width="100%" color="black" />
+    <form action="/contests" method="POST">
+        <div id = "crc">
+            <img src="/small.gif" width="90%" height = "20%"/>
+        </div>
+    </form>
+    
+    
+</div>
+<br />
+
+<div id="cu">
+    <h3>Upcoming Contests</h3>
+    <hr width="100%" color="black">
+    <form action="/contests" method="POST">
+        <div id = "cuc">
+            <img src="/small.gif" width="90%" height = "20%"/>
+        </div>
+    </form>
+    
+
+</div>
+
+<br />
+
+<div id="cp">
+    <h3>Past Contests</h3>
+    <hr width="100%" color="black">
+    <form action="/contests" method="POST">
+        <div id = "cpc">
+            <img src="/small.gif" width="90%" height="20%"/>
+        </div>
+    </form>
+    
+</div>
+
+<script>
+    
+    $("#crcontest").ready(function(){
+		$.ajax({
+			url: '/contests/contestdetails',
+            success: function(res) {
+				var cr = $('#crc');
+				var cu = $('#cuc');
+				var cp = $('#cpc');
+
+
+                var crc = res.CRName || [];
+                var cuc = res.CUName || [];
+                var cpc = res.CPName || [];
+                var crd = res.crdur || [];
+                var cud = res.cudur || [];
+                var ced = res.cpdur || [];
+                var crdt = res.CRDate || [];
+                var cudt = res.CUDate || [];
+                var cedt = res.CPDate || [];
+
+				cr.html('');
+                cu.html('');
+                cp.html('');
+                
+                if(crc.length>0){
+                    var x = '';    
+                    for(let i=0;i<crc.length;i++){
+                        var date = crdt[i].split('T')[0];
+                        var time = crdt[i].split('T')[1].split('.')[0];
+                        
+                        x+=('<tr><td class="text-center" width="10%">'+Number(i+1)+'</td><td class="text-center" width="40%"><button type="submit" name = "'+crc[i]+'" value = "'+crc[i]+'">'+crc[i]+'</button></td><td>'+crd[i]+'</td><td>'+date+'<br />'+time+'</td><td class="text-center" width="20%">Running</td></tr>');
+                    }
+                    cr.append('<table class="contest-page" width="100%" border="1px solid black"><tr><th class="text-center" width="10%">S. No.</th><th class="text-center" width="40%">Name</th><th width="10%">Duration</th><th>Date</th><th class="text-center" width="20%">Status</th></tr>' + x + '</table>');
+                    
+                } else {
+                    cr.append("No contests available");
+                }
+                
+                if(cuc.length>0){
+                    var x = '';    
+                    for(let i=0;i<cuc.length;i++){
+                        var date = crdt[i].split('T')[0];
+                        var time = crdt[i].split('T')[1].split('.')[0];
+                        
+                        x+=('<tr><td class="text-center" width="10%">'+Number(i+1)+'</td><td class="text-center" width="40%"><button type="submit" name = "'+cuc[i]+'" value = "'+cuc[i]+'">'+cuc[i]+'</button></td><td>'+cud[i]+'</td><td>'+date+'<br />'+time+'</td><td class="text-center" width="20%">Upcoming</td></tr>');
+                    }
+                    cu.append('<table class="contest-page" width="100%" border="1px solid black"><tr><th class="text-center" width="10%">S. No.</th><th class="text-center" width="40%">Name</th><th width="10%">Duration</th><th>Date</th><th class="text-center" width="20%">Status</th></tr>' + x + '</table>');
+                } else {
+                    cu.append("No contests available");
+                }
+                
+                if(cpc.length>0){
+                    var x = '';    
+                    for(let i=0;i<cpc.length;i++){
+                        
+                        var date = crdt[i].split('T')[0];
+                        var time = crdt[i].split('T')[1].split('.')[0];
+                        x+=('<tr><td class="text-center" width="10%">'+Number(i+1)+'</td><td class="text-center" width="40%"><button type="submit" name = "'+cpc[i]+'" value = "'+cpc[i]+'">'+cpc[i]+'</button></td><td>'+ced[i]+'</td><td>'+date+'<br />'+time+'</td><td class="text-center" width="20%">Ended</td></tr>');
+                    }
+                    cp.append('<table class="contest-page" width="100%" border="1px solid black"><tr><th class="text-center" width="10%">S. No.</th><th class="text-center" class="text-center" width="40%">Name</th><th width="10%">Duration</th><th>Date</th><th class="text-center" width="20%">Status</th></tr>' + x + '</table>');
+                } else {
+                    cp.append("No contests available");
+                }
+
+            }
+        });
+	});
+</script>

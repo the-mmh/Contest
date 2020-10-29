@@ -1,0 +1,104 @@
+<style>
+    .tab tr th, .tab tr td{
+        padding:8px;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .heading{
+        color: #337ab7;
+        background: rgba(0, 0, 0, 0);
+        border:none;
+    }
+
+    
+</style>
+
+<br />
+
+<table id='tab' class="tab" border = "1px solid #000">
+    <thead>
+        <tr>
+            {{!-- <form id="allprob" method="POST" action="/admin/allprob"> --}}
+                <th><button id="code" class="heading" type = "submit" value="probCode" name="sort">Problem Code</button></th>
+                <th><button id="score" class="heading" type = "submit" value="score" name="sort">Score</button></th>
+            {{!-- </form> --}}
+
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody id = "allprobtable">
+        <tr>
+            <td colspan="3">
+                <img src="/image-asset.gif" width="30%" height="30%" style="margin:auto" />
+            </td>
+        </tr>
+    </tbody>
+    
+</table>
+<script src="/ajax.js"></script>
+<script>
+    $(document).ready(() => {
+
+        $.ajax({
+            url: '/admin/allprob/query',
+            success: function(res) {
+                
+                var x = $('#allprobtable');
+                x.html('');
+                console.log(res.obj);
+                res.obj.forEach((row) => {
+                    x.append('\
+                            <tr>\
+                            <td>' + row.probCode + '</td>\
+                            <td>' + row.score + '</td>\
+                            <td><a href="/admin/statement/' + row.probCode + '">Click</a></td>\
+                            </tr>\
+                        ');
+                })
+            }
+        })
+    })
+    $(function() {
+        $('#code').on('click', function() {
+            $.ajax({
+                url: '/admin/allprob/query?sortby=code',
+                success: function(res) {
+                    var x = $('tbody');
+                    x.html('');
+                    // console.log(res.obj);
+                    res.obj.forEach((row) => {
+                        x.append('\
+                                <tr>\
+                                <td>' + row.probCode + '</td>\
+                                <td>' + row.score + '</td>\
+                                <td><a href="/admin/statement/' + row.probCode + '">Click</a></td>\
+                                </tr>\
+                            ');
+                    })
+                }
+            })
+        })
+    })
+    $(function() {
+        $('#score').on('click', function() {
+            $.ajax({
+                url: '/admin/allprob/query?sortby=score',
+                success: function(res) {
+                    var x = $('tbody');
+                    x.html('');
+                    // console.log(res.obj);
+                    res.obj.forEach((row) => {
+                        x.append('\
+                                <tr>\
+                                <td>' + row.probCode + '</td>\
+                                <td>' + row.score + '</td>\
+                                <td><a href="/admin/statement/' + row.probCode + '">Click</a></td>\
+                                </tr>\
+                            ');
+                    })
+                }
+            })
+        })
+    })
+</script>

@@ -1,0 +1,35 @@
+<style>
+  .form-control{
+    width:50%
+  }
+</style>
+<h2>Add New Contest</h2>
+<form action="/admin/addcontest" method="POST">
+    <div class="form-group">
+    <label class="control-label" for="Name">Contest Name</label>
+    <input class="form-control" type="text" id="name" name="name" />
+    </div>
+    <div class="form-group">
+    <label class="control-label" for="code">Contest Code</label>
+    <input class="form-control" type="text" id="code" name="code" />
+    </div>
+    <div class="form-group">
+    <label class="control-label" for="date">Contest Date</label>
+    <input class="form-control" type="datetime-local" id="date" name="date" />
+    </div>
+    <div class="form-group">
+    <label class="control-label" for="duration">Contest Duration</label>
+    <input class="form-control" type="number" id="duration" name="duration" />
+    </div>
+    <div class="form-group">
+    <label class="control-label" for="problems">Enter ',' seperated problem codes</label>
+    <input class="form-control" type="text" id="problems" name="problems" /> (e.g. = Code1,Code2,Code3.........)
+    </div>
+    
+    <input class="btn btn-outline-primary" type = "submit" name = "submit" value = "Submit"/>
+</form>
+<br>
+<div>
+Click <a href="/admin/allprob">here</a> to see not asked questions in database.
+</div>
+

@@ -1,0 +1,182 @@
+
+
+
+<br />
+
+<style>
+
+    td, th{
+        padding:10px;
+        width:130px;
+        text-align: center;
+        justify-content: center;
+    }
+    .verd{
+       font-weight:600;
+       font-size: 14px;
+        
+    }
+
+</style>
+
+<table style="margin: auto" id="statustable" border = "1px solid #000">
+    <thead>
+        <tr>
+            <th>S_ID</th>
+            <th>User</th>
+            <th>ProbCode</th>
+            <th>DT</th>
+            <th>Language</th>
+            <th>Verdict</th>
+            <th>Time</th>
+            <th>Memory</th>
+        </tr>
+    </thead>
+    <tbody id="statusdet">
+        
+    </tbody>
+</table>
+
+<center id = "loader">
+    <img src="/image-asset.gif" />
+</center>
+
+<br />
+
+
+<div id="statusPagination">
+    
+</div>
+
+
+<br />
+Displaying <z id="nos"></z> results per page<br />
+<br />
+Page <z id="lpage"></z> of <z id="llast"></z>
+<br />
+
+<script>
+
+    
+    $(document).ready(() => {
+        var cp = window.location.pathname;
+        cp = cp.toString().trim();
+        cp = cp.split('/');
+        cp = cp[cp.length-1];
+        console.log(cp);
+        $.ajax({
+            
+            url: '/contests/statusdetails/'+cp,
+            success: (res) => {
+                
+                var st = $("#statusdet");
+                st.html('');
+                var data = res.subs;
+                for(let i = 0; i < data.length; i++){
+                     console.log(data[i][0]);
+                    st.append('\
+                        <tr>\
+                            <td><a href="/users/usersubmission/'+data[i][1]+'/'+data[i][0]+'">' + data[i][0] + '</a></td>\
+                            <td><a href="/users/user/'+data[i][1]+'" />' + data[i][1] + '</a></td>\
+                            <td>' + data[i][2] + '</td>\
+                            <td>' + data[i][3] + '</td>\
+                            <td>' + data[i][7] + '</td>\
+                            <td class="verd" id = "'+data[i][0]+'">' + data[i][4] + '</td>\
+                            <td>' + data[i][5] + 'ms</td>\
+                            <td>' + data[i][6] + 'KB</td>\
+                        </tr>\
+                    ');
+                    var y=data[i][0];
+                    var x=data[i][4];
+                    if(x=="Accepted"){
+                        document.getElementById(y).style.color="green";
+                    }else if(x=="Compiling" || x=="In queue"){
+                        document.getElementById(y).style.color="DodgerBlue";
+                    }
+                    else if(x=="CE"){
+                        document.getElementById(y).style.color="Orange";
+                    }
+                    else{
+                        document.getElementById(y).style.color="red";
+                    }
+                }
+                 
+                
+
+                var sp = $("#statusPagination"), lo = $("#loader");
+                sp.html('');
+                lo.empty();
+
+                if(res.checkp){
+                    if(res.checkm){
+                        sp.append('\
+                            <ul class="pagination justify-content-center">\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/1" value="1"> First </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/'+res.prev+'" value="'+res.prev+'"> Prev </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/'+res.midp+'" value="'+res.midp+'"> '+res.midp+' </a></li>\
+                                <li class="page-item active"><a class="page-link" href = "/contests/status/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/'+res.next+'" value="'+res.next+'"> Next </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/'+res.mid+'" value="'+res.mid+'"> '+res.mid+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/'+res.last+'" value="'+res.last+'"> Last </a></li>\
+                            </ul>\
+                        ');
+                    } else {
+                        sp.append('\
+                            <ul class="pagination justify-content-center">\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/1" value="1"> First </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/'+res.prev+'" value="'+res.prev+'"> Prev </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/'+res.midp+'" value="'+res.midp+'"> '+res.midp+' </a></li>\
+                                <li class="page-item active"><a class="page-link" href = "/contests/status/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/'+res.next+'" value="'+res.next+'"> Next </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/'+res.last+'" value="'+res.last+'"> Last </a></li>\
+                            </ul>\
+                        ');
+                    }
+                } else {
+                    if(res.checkm){
+                        sp.append('\
+                            <ul class="pagination justify-content-center">\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/1" value="1"> First </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/'+res.prev+'" value="'+res.prev+'"> Prev </a></li>\
+                                <li class="page-item active"><a class="page-link" href = "/contests/status/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/'+res.next+'" value="'+res.next+'"> Next </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/'+res.mid+'" value="'+res.mid+'"> '+res.mid+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/'+res.last+'" value="'+res.last+'"> Last </a></li>\
+                            </ul>\
+                        ');
+                    } else {
+                        sp.append('\
+                            <ul class="pagination justify-content-center">\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/1" value="1"> First </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/'+res.prev+'" value="'+res.prev+'"> Prev </a></li>\
+                                <li class="page-item active"><a class="page-link" href = "/contests/status/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/'+res.next+'" value="'+res.next+'"> Next </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/contests/status/'+res.last+'" value="'+res.last+'"> Last </a></li>\
+                            </ul>\
+                        ');
+                    }
+                }
+
+                $("#nos").html('');
+                $("#llast").html('');
+                $("#lpage").html('');
+
+                $("#nos").append(res.nos);
+                $("#llast").append(res.last);
+                $("#lpage").append(res.page);
+
+
+                
+
+                
+
+            }
+        })
+
+    });
+    
+    
+
+    
+
+</script>

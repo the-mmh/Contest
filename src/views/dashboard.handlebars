@@ -1,0 +1,307 @@
+<style type="text/css" media="screen">
+  #editor {
+    margin: 0;
+    width: 100%;
+    height: 40em;
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+</style>
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<div>  
+  <div style="width:100%;background-color:#e9ecef;padding:20px;margin-bottom:50px;">
+  <h3>Welcome {{username}}</h3>
+  </div>
+  <div class = "container bg-light" style="width:90%;padding:20px">
+    <div class = "row">
+      <div class = "col-sm-10" style = "text-align: left;">
+        <div class = "row">
+          <div id = "conhead" class = "col-sm-3" style = "text-align: left;">
+            <b>Contact: </b>
+          </div>
+          <div id = "concon" class = "col-sm-3" style = "text-align: left;">
+            {{contact}}
+            
+          </div>
+          
+          <div id="conedit" class = "col-sm-3" style = "text-align: right;">
+            
+            <button id="contactedit" onclick="fn()" type="submit">Edit</button>
+          </div>
+          
+          </div>
+          <br>
+
+        <div class = "row">
+          <div class = "col-sm-3" style = "text-align: left;">
+            <b>Email: </b>
+          </div>
+          <div class = "col-sm-3" style = "text-align: left;">
+            {{email}}
+          </div>
+        </div>
+        <br>
+        <div class = "row">
+          <div id = "cont" class = "col-sm-3" style = "text-align: left;">
+            <b>Language: </b>
+          </div>
+          <div id = "contl" class = "col-sm-3" style = "text-align: left;">
+            {{flang}}
+            
+          </div>
+
+        </div>
+        <br />
+        <div class = "row">
+          <div id = "rating" class = "col-sm-3" style = "text-align: left;">
+            <b>Rating: </b>
+          </div>
+          <div id = "ratingvalue" class = "col-sm-3" style = "text-align: left;">
+            {{crating}}
+          </div>
+
+        </div>
+        <br />
+        <div class = "row">
+          <div id = "mis" class = "col-sm-3" style = "text-align: left;">
+            <b>MIS: </b>
+          </div>
+          <div id = "misvalue" class = "col-sm-3" style = "text-align: left;">
+            {{mis}}
+          </div>
+
+        </div>
+        <br />
+        
+      </div>
+      <div class = "col-sm-2" style = "text-align: right;">
+        {{#if admin}}
+          <a href="/admin">Admin Page</a><br />
+        {{/if}}
+        
+      </div>
+    </div>
+  </div>
+
+
+  <div class="container" style="margin-top:20px">
+    <div class="row">
+      <div class="col-sm-6">
+        <a href = "/users/submissions/{{username}}/submissions/1" style="color:#fff;">
+          <div class = "card text-center">
+            <div class="card-body">
+              Submissions
+            </div>
+          </div>
+        </a>
+      </div>
+      <div id="ledit" class = "col-sm-6" style = "text-align: right;">
+        <button id="tedit" onclick="edit()" type="submit" style="color:#fff;width:100%;text-decoration:none;">
+          <div class = "card bg-dark text-center">
+            <div class="card-body">
+              Edit Template
+            </div>
+          </div>
+        </button>
+      </div>
+    </div>
+    <div id="edit" style="margin:20px;">
+  </div>
+  <input type="hidden" name="code" id="code" value="{{code}}">
+  <input type="hidden" name="lang" id="lang" value="{{flang}}">
+  <div id="demo"></div>
+  </div>
+ 
+  
+
+  <center>
+    <table class="performance" border="1px solid #000">
+      {{#if participation}}
+        <tr>
+          <th>Contest Code</th>
+          <th>Rank</th>
+          <th>oldrating</th>
+          <th>Newrating</th>
+        </tr>
+      
+        {{#each ratingdata}}
+          <td>{{this.code}}</td>
+          <td>{{this.rank}}</td>
+          <td>{{this.oldrating}}</td>
+          <td>{{this.newrating}}</td>
+        {{/each}}
+      {{else}}
+        <br />
+        <br />
+        No Contest Participation data
+      {{/if}}
+    </table>
+  </center>
+   
+
+</div>
+
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-themelist.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-c_cpp.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/theme-textmate.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-modelist.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/ace/src/ace.js"></script>
+<script src="/ace/src/ext-modelist.js"></script>
+
+
+<script>
+  var edit = () =>{
+    document.getElementById("ledit").innerHTML="";
+
+    document.getElementById("edit").innerHTML='<select class="selectpicker" data-live-search="true" class="form-control" name="Language" id="mode" onchange="changeMode()">              <option value="C" id="C" selected>C</option>              <option value="C++" id="C++">C++</option>              <option value="Java" id="Java">Java</option>              <option value="Python" id="Python">Python</option>  </select><div id="editor" style="border: solid lightblue;" name="editor" ></div> ';
+    document.getElementById("demo").innerHTML='<button class="btn btn-outline-primary" id="tsave" onclick="editsave()" type="submit">Save</button> <button class="btn btn-outline-secondary"  onclick="cancel()" >Cancel</button>';
+    var flang=document.getElementById("lang").value;
+    var code=document.getElementById("code").value;
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/xcode");
+     editor.setOptions({
+    enableBasicAutocompletion: true,
+    enableSnippets: true
+});
+    editor.setShowPrintMargin(false);
+    if(flang){
+    document.getElementById(flang).setAttribute("selected","true");
+      if(flang=='C'||flang=="C++"){
+           editor.session.setMode("ace/mode/c_cpp");
+           editor.clearSelection();
+      }else if(flang=="Java"){
+        editor.session.setMode("ace/mode/java");
+        editor.clearSelection();
+      }else if(flang=="Python"){
+        editor.session.setMode("ace/mode/python3");
+        editor.clearSelection();
+      }        
+    }else{
+      editor.session.setMode("ace/mode/c_cpp");
+      editor.clearSelection();
+    }
+    editor.setValue(code);
+    
+    
+  }
+
+  function editsave() {
+    if(confirm("Do you want to change your template?")){
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/xcode");
+    editor.setShowPrintMargin(false);
+    	var xx = document.getElementById("mode");
+    var y = xx.options[xx.selectedIndex].value;
+          var x=editor.getSession().getValue();
+         document.getElementById("lang").value=y;
+         document.getElementById("code").value=x;
+          $.post("/users/edittemp", {flang:y , template:x});
+          document.getElementById("edit").innerHTML="";
+          document.getElementById("demo").innerHTML="";
+          document.getElementById("ledit").innerHTML='<button id="tedit" onclick="edit()" type="submit" style="color:#fff;width:100%;text-decoration:none;">          <div class = "card bg-dark text-center">            <div class="card-body">              Edit Template            </div>          </div>        </button>';
+          alert("Your template changed!!!");
+          }else{
+            document.getElementById("edit").innerHTML="";
+          document.getElementById("demo").innerHTML="";
+          document.getElementById("ledit").innerHTML='<button id="tedit" onclick="edit()" type="submit" style="color:#fff;width:100%;text-decoration:none;">          <div class = "card bg-dark text-center">            <div class="card-body">              Edit Template            </div>          </div>        </button>';
+          alert("Template not changed!!!");
+          }
+  }
+  function cancel(){
+    document.getElementById("edit").innerHTML="";
+          document.getElementById("demo").innerHTML="";
+          document.getElementById("ledit").innerHTML='<button id="tedit" onclick="edit()" type="submit" style="color:#fff;width:100%;text-decoration:none;">          <div class = "card bg-dark text-center">            <div class="card-body">              Edit Template            </div>          </div>        </button>';
+          alert("Template not changed!!!");
+  }
+
+  function changeMode() {
+      var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/xcode");
+    editor.setShowPrintMargin(false);
+    
+   	var x = document.getElementById("mode");
+    var modeValue = x.options[x.selectedIndex].value;
+    
+    var flang=document.getElementById("lang").value;
+    var code=document.getElementById("code").value;
+    if(modeValue==flang){
+      editor.setValue(code);
+    }else{
+      if(modeValue=="Python"){
+        editor.setValue("# Enter code here");
+      }else{
+        editor.setValue("// Enter code here");
+      }
+    }
+
+
+    if (modeValue == "C") {
+    	editor.session.setMode("ace/mode/c_cpp");
+        editor.clearSelection();
+    }
+    if (modeValue == "C++") {
+    	editor.session.setMode("ace/mode/c_cpp");
+      editor.clearSelection();
+    }
+    if (modeValue == "Java") {
+    	editor.session.setMode("ace/mode/java");
+    	editor.clearSelection();
+    }
+    if(modeValue == "Python") {
+        editor.session.setMode("ace/mode/python3");
+        editor.clearSelection();
+    }
+    
+}
+
+
+  
+  function fn() {
+    var x = document.getElementById("contactedit").innerHTML;
+    if(x === "Edit"){
+      document.getElementById("contactedit").innerHTML = "Save";
+      x = document.getElementById("concon").innerHTML;
+      $("#concon").html('');
+      var inp = '<input type="text" id = "concon1" value='+x+' name="concon1" />'
+      $("#concon").append(inp);
+      
+    } else {
+      
+      
+      x = document.getElementById("concon1").value;
+      
+      if(x.length<1){
+        document.getElementById("demo").innerHTML = "Contact field can't be empty";
+        document.getElementById("demo").style.color = "red";
+        return;
+      }
+      x = (x.toString()).trim();
+      $("#demo").html('');
+      document.getElementById("contactedit").innerHTML = "Edit";
+      $.post("/users/edit", {newcontact: x});
+      $("#concon").html('');
+      document.getElementById("concon").innerHTML = x;
+    }
+  }
+
+    
+
+
+  
+  
+
+</script>
+

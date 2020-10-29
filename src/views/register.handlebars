@@ -1,0 +1,133 @@
+<style>
+  .form-control{
+    width:50%
+  }
+</style>
+<h2>Register Yourself</h2>
+
+<form class="form-horizontal" action="/users/register" method="POST">
+   
+
+   
+    
+
+  <div class="form-group">
+  <label class="control-label" for="inputEmail">Email address:</label>  
+  <input  class="form-control" type="email" id="inputEmail" name="email" placeholder="Email address">
+  </div>
+  <div class="form-group">
+  <label class="control-label" for="inputUsername">Username:</label>
+  <input class="form-control" type="text" id="inputUsername" name="username" placeholder="Username">
+  </div>
+  
+ 
+   <input type="text" hidden name="role" id="role" value="User">
+    
+  
+<div class="form-group">
+  <label  class="control-label" for="inputPassword">Password:</label>
+  <input class="form-control" type="password" onkeyup="fn1()" id="inputPassword" name="password" placeholder="Password">
+</div>
+  <div class="form-group">
+  <label class="control-label" for="inputConfirmPassword">Confirm Password:</label>
+  <input class="form-control" type="password" onkeyup="fn()" id="inputConfirmPassword" name="confirmationPassword" placeholder="Confirm Password">
+  </div>
+  <div id="status"></div>
+
+  <div class="form-group">
+  <label class="control-label" for="Contact">Contact:</label>
+  <input class="form-control" type="text" id="contact" name="contact" placeholder="Contact">
+  </div>
+  <div class="form-group">
+  <label class="control-label" for="Contact">MIS:</label>
+  <input class="form-control" type="text" id="mis" name="mis" placeholder="mis">
+  </div>
+  <div class="form-group">
+
+  <label class="control-label" for="mode">Language:</label>
+  <select class="form-control selectpicker" data-live-search="true" id="mode" onchange="changeMode()">
+              <option value="C" id="C" selected>C</option>
+              <option value="C++" id="C++">C++</option>
+              <option value="Java" id="Java">Java</option>
+              <option value="Python" id="Python">Python</option>
+    </select>
+
+     </div>
+    <input  type="hidden" name="flang" id="flang" value="C"> 
+  <input  type="hidden" name="template" placeholder="Contact" value=" ">
+
+
+
+  <button class="btn btn-outline-primary" type="submit">Sign up</button>
+</form>
+
+<script>
+  function changeMode(){
+    var y = document.getElementById("mode");
+    var x = y.options[y.selectedIndex].value;
+    console.log(x);
+    document.getElementById("flang").value = x;
+  }
+  function fn(){
+    var x = document.getElementById("inputPassword").value;
+    var y = document.getElementById("inputConfirmPassword").value;
+    var z = document.getElementById("status");
+    
+    if(x.length === 0 && y.length === 0){
+      z.innerHTML = "Passwords are not mandatory!";
+      z.style.color = "red";
+      return;
+    }
+    if(x!=y){
+      document.getElementById("status").innerHTML = "Passwords do not match!";
+      var z = document.getElementById("status");
+      z.style.color = "red";
+    } else {
+      if(x.length<8){
+        z.innerHTML = "Password too short";
+        z.style.color = "red";
+      } else {
+        document.getElementById("status").innerHTML = "Passwords matched!";
+        var z = document.getElementById("status");
+        z.style.color = "green";
+      }
+    }
+  }
+  function fn1(){
+    var x = document.getElementById("inputPassword").value;
+    var y = document.getElementById("inputConfirmPassword").value;
+    if(x.length === 0 && y.length===0){
+      var z = document.getElementById("status");
+      z.innerHTML = "Passwords are mandatory";
+      return;
+    }
+    if(y.length === 0){
+      var z = document.getElementById("status");
+      if(x.length === 0){
+        z.innerHTML = "";
+        return;
+      }
+      if(x.length<8){
+        
+        z.innerHTML = "Password too short";
+        z.style.color = "red";
+      } else {
+        z.innerHTML = "";
+      }
+      return;
+    }
+    
+    
+    if(x!=y){
+      document.getElementById("status").innerHTML = "Passwords do not match!";
+      var z = document.getElementById("status");
+      z.style.color = "red";
+    } else {
+      document.getElementById("status").innerHTML = "Passwords matched!";
+      var z = document.getElementById("status");
+      z.style.color = "green";
+    }
+  }
+  
+    
+</script>

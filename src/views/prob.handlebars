@@ -1,0 +1,140 @@
+
+
+
+
+{{> navcontest}}
+
+<br />
+<br />
+
+<div class="container">
+	<div class="row">
+		<div class="col-sm-9" style="line-height: 3">
+			<h3 id = "probCode">Problem Code</h3>
+			<p id = "probCodec">
+				
+			</p>
+			<br />
+
+
+			<h3 id = "state">Problem Statement</h3>
+			<z id = "statec">
+				<img src="/big.gif" width="90%" />
+			</z>
+			<br />
+
+			<h3 id = "inp">Input</h3>
+			<z id = "inpc">
+				<img src="/small.gif" width="90%" />
+			</z>
+			<br />
+
+			<h3 id = "out">Output</h3>
+			<z id = "outc">
+				<img src="/small.gif" width="90%" />
+			</z>
+			<br />
+		</div>
+		<div class="col-sm-3 text-center align-items-start text-dark">
+			<form action="/contests/quespage/prob/{{CPCode}}" method="POST">
+				<input type="submit" name = "submit" value = "Submit Code"><br /><br />
+			</form>
+			<h4 id = "sco">Score</h4>
+			<z id = "scoc"></z>
+			<br />
+
+			<h id = "tl">Time Limit (sec): </h>
+			<z id = "tlc"></z>
+			<br />
+
+			<h id = "ml">Memory Limit (MB): </h>
+			<z id = "mlc"></z>
+			<br />
+		</div>
+	</div>
+	<div class="row align-items-center text-dark" style="margin-top:20px; line-height:4; padding:20px; background: rgb(218, 216, 216);">
+		<div class="col-sm-12">
+			<h id = "set" class="h5">Setter: </h>
+			<z id = "setc"></z>
+			<br />
+
+			<h id = "test" class="h5">Tester: </h>
+			<z id = "testc"></z>
+			<br />
+
+			<h id = "datea" class="h5">Date Added: </h>
+			<z id = "datec"></z>
+			<br />
+			
+			
+			
+		</div>
+	</div>
+</div>
+<br />
+<br />
+<form action="/contests/quespage/prob/{{CPCode}}" method="POST">
+	<input type="submit" name = "submit" value = "Submit Code"><br /><br />
+</form>
+
+
+
+
+
+<script src="/js/ajax.js"></script>
+<script>
+	
+            
+	
+	$(document).ready(function(){
+		
+		var path = '/contests/getprobmain/{{CPCode}}';
+		console.log(path);
+		$.ajax({
+            url: '/contests/getprobmain/{{CPCode}}',
+            success: function(res) {
+                
+				
+				var data = JSON.parse(res.obj);
+				console.log(data);
+				$("#statec").html('');
+				$("#statec").append(data.statement);
+				$("#inpc").html('');
+				$("#inpc").append(data.input);
+				$("#outc").html('');
+				$("#outc").append(data.output);
+				
+            
+            }
+        });
+		
+	});
+
+	$(document).ready(function(){
+		$.ajax({
+			url: '/contests/getprobdetails/{{CPCode}}',
+            success: function(res) {
+                
+				
+				var data = JSON.parse(res.obj);
+				console.log(data);
+				$("#probCodec").html('');
+				$("#probCodec").append(data.probCode);
+				$("#setc").html('');
+				$("#setc").append(data.probSetter);
+				$("#testc").html('');
+				$("#testc").append(data.probSetter);
+				$("#datec").html('');
+				$("#datec").append(data.dateAdded);
+				$("#tlc").html('');
+				$("#tlc").append(data.tl);
+				$("#mlc").html('');
+				$("#mlc").append(data.ml);
+				$("#scoc").html('');
+				$("#scoc").append(data.score);
+            }
+        });
+	});
+	
+	
+</script>

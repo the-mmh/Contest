@@ -1,0 +1,178 @@
+body {
+    padding-top: 0px;
+    padding-bottom: 40px;
+    margin-bottom: 100px;
+}
+
+th,
+td {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    font-size: 13px;
+}
+
+td {
+    padding: 5px;
+}
+
+th {
+    background: rgb(83, 83, 83);
+    color: rgb(214, 214, 214);
+    padding: 10px;
+}
+
+tr:nth-child(odd):hover,
+tr:nth-child(even):hover {
+    background: rgb(255, 255, 231);
+    padding: 8px;
+}
+
+th button {
+    color: white;
+    text-decoration: none;
+}
+
+tr {
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+}
+
+tr:nth-child(odd) {
+    background: rgb(225, 220, 231);
+}
+
+table {
+    margin: 20px;
+    box-shadow: 0px 0px 10px grey;
+}
+
+.servertime {
+    border-top: 3px solid rgb(212, 209, 223);
+    border-right: 3px solid rgb(212, 209, 223);
+    box-shadow: 0px 0px 10px grey;
+    border-radius: 8px;
+    bottom: 10;
+    right: 10;
+    z-index: 99999;
+    position: fixed;
+    background-color: rgb(168, 164, 187);
+    padding: 10px;
+    text-align: center;
+}
+
+a.nav-link {
+    position: relative;
+}
+
+a.nav-link:before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #fff;
+    visibility: hidden;
+    transform: scaleX(0);
+    transition: all 0.2s ease-in-out;
+}
+
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+::-webkit-scrollbar-track {
+    background: #fff;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #343A40;
+    transition: all 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #000;
+}
+
+a.nav-link:hover:before {
+    visibility: visible;
+    transform: scaleX(1);
+}
+
+.footer {
+    margin-top: 15px;
+    font-size: 14px;
+    font-weight: 599;
+    width: 100%;
+    padding: 20px;
+    background-color: #343a40!important;
+    color: #ffffff;
+    bottom: 0;
+    position: fixed;
+    z-index: 9999;
+}
+
+.card {
+    box-shadow: 0px 0px 10px grey;
+    background: rgb(52, 58, 64) !important;
+    transition: all 0.2s;
+}
+
+.card:hover {
+    box-shadow: 0px 0px 7px #000;
+    margin: -10px;
+}
+
+.contest-page tr td {
+    height: 50px;
+}
+
+a:hover {
+    text-decoration: none !important;
+}
+
+.quespage-table tr td,
+.quespage-table tr th {
+    text-align: center;
+}
+
+.quespage-table tr td {
+    height: 30px;
+}
+
+.contest-page tr td button {
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.contest-page tr td {
+    font-size: 15px;
+}
+
+.performance tr td {
+    text-align: center;
+}
+
+.performance tr th {
+    text-align: center;
+}
+
+.performance tr {
+    height: 40px;
+}
+
+.performance {
+    width: 90%;
+    margin: 20px;
+}
+
+.tableleaderboard tr td {
+    text-align: center;
+    height: 40px;
+}
+
+.tableleaderboard tr th {
+    text-align: center;
+}

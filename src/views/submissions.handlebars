@@ -1,0 +1,212 @@
+
+
+<br />
+<br />
+
+<style>
+
+    td, th{
+        padding:10px;
+        width:130px;
+        text-align: center;
+        justify-content: center;
+    }
+    .verd{
+       font-weight:600;
+       font-size: 14px;
+        
+    }
+
+</style>
+
+<script src = "/socket.io/socket.io.js"></script>
+<script>
+    var socket = io();
+    socket.on('change', (data) => {
+        var id = data.id;
+        $('#verdict'+id).html('');
+        $('#verdict'+id).html(data.verdict);
+        $('#time'+id).html('');
+        $('#time'+id).html(data.time+"ms");
+        $('#memory'+id).html('');
+        $('#memory'+id).html(data.memory+"KB");
+        var y="verdict"+id;
+        var x=data.verdict;
+        if(x=="Accepted"){
+            document.getElementById(y).style.color="green";
+        }else if(x=="Compiling" || x=="In queue"){
+            document.getElementById(y).style.color="DodgerBlue";
+        }
+        else if(x=="CE"){
+            document.getElementById(y).style.color="Orange";
+        }
+        else if(x[0] == "w" || x[3] == '-' || x[0] == "T"){
+            document.getElementById(y).style.color="red";
+        } else {
+            document.getElementById(y).style.color="black";
+        }
+    })
+
+
+</script>
+
+<p id = "demo"></p>
+
+<table style="margin: auto;" id="subtable" border = "1px solid #000">
+    <thead>
+        <tr>
+            <th>S_ID</th>
+            <th>User</th>
+            <th>ProbCode</th>
+            <th>DT</th>
+            <th>Language</th>
+            <th>Verdict</th>
+            <th>Time</th>
+            <th>Memory</th>
+        </tr>
+    </thead>
+    <tbody id="subdet">
+        
+    </tbody>
+</table>
+
+<center id = "loaders">
+    <img src="/image-asset.gif" />
+</center>
+
+<br />
+
+
+<div id="subPagination">
+    
+</div>
+
+
+<br />
+Displaying <z id="noss"></z> results per page<br />
+<br />
+Page <z id="lpages"></z> of <z id="llasts"></z>
+<br />
+
+<script>
+
+    
+    $(document).ready(() => {
+        var cp = window.location.pathname;
+        cp = cp.toString().trim();
+        cp = cp.split('/');
+        cp = cp[cp.length-1];
+        
+    
+        $.ajax({
+            
+            url: '/users/submissions/{{user}}/getsub/'+cp,
+            success: (res) => {
+                console.log(res);
+                var st = $("#subdet");
+                st.html('');
+                var data = res.subs, user = res.user;
+                for(let i = 0; i < data.length; i++){
+
+                    st.append('\
+                        <tr>\
+                            <td><a href="/users/usersubmission/'+data[i][1]+'/'+data[i][0]+'">' + data[i][0] + '</a></td>\
+                            <td><a href="/users/user/'+data[i][1]+'" />' + data[i][1] + '</a></td>\
+                            <td>' + data[i][2] + '</td>\
+                            <td>' + data[i][3] + '</td>\
+                            <td>' + data[i][7] + '</td>\
+                            <td class="verd" id = "verdict'+data[i][0]+'">' + data[i][4] + '</td>\
+                            <td id = "time'+data[i][0]+'">' + data[i][5] + 'ms</td>\
+                            <td id = "memory'+data[i][0]+'">' + data[i][6] + 'KB</td>\
+                        </tr>\
+                    ');
+                    var y="verdict"+data[i][0];
+                    var x=data[i][4];
+                    if(x=="Accepted"){
+                        document.getElementById(y).style.color="green";
+                    }else if(x=="Compiling" || x=="In queue"){
+                        document.getElementById(y).style.color="DodgerBlue";
+                    }
+                    else if(x=="CE"){
+                        document.getElementById(y).style.color="Orange";
+                    }
+                    else if(x[0] == "w" || x[3] == '-' || x[0] == "T"){
+                        document.getElementById(y).style.color="red";
+                    } else {
+                        document.getElementById(y).style.color="black";
+                    }
+                    
+                }
+
+                var sp = $("#subPagination"), lo = $("#loaders");
+                sp.html('');
+                lo.empty();
+
+                if(res.checkp){
+                    if(res.checkm){
+                        sp.append('\
+                            <ul class="pagination justify-content-center">\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/1" value="1"> First </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.prev+'" value="'+res.prev+'"> Prev </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.midp+'" value="'+res.midp+'"> '+res.midp+' </a></li>\
+                                <li class="page-item active"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.next+'" value="'+res.next+'"> Next; </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.mid+'" value="'+res.mid+'"> '+res.mid+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.last+'" value="'+res.last+'"> Last </a></li>\
+                            </ul>\
+                        ');
+                    } else {
+                        sp.append('\
+                            <ul class="pagination justify-content-center">\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/1" value="1"> First </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.prev+'" value="'+res.prev+'"> Prev </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.midp+'" value="'+res.midp+'"> '+res.midp+' </a></li>\
+                                <li class="page-item active"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.next+'" value="'+res.next+'"> Next </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.last+'" value="'+res.last+'"> Last </a></li>\
+                            </ul>\
+                        ');
+                    }
+                } else {
+                    if(res.checkm){
+                        sp.append('\
+                            <ul class="pagination justify-content-center">\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/1" value="1"> First </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.prev+'" value="'+res.prev+'"> Prev </a></li>\
+                                <li class="page-item active"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.next+'" value="'+res.next+'"> Next </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.mid+'" value="'+res.mid+'"> '+res.mid+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.last+'" value="'+res.last+'"> Last </a></li>\
+                            </ul>\
+                        ');
+                    } else {
+                        sp.append('\
+                            <ul class="pagination justify-content-center">\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/1" value="1"> First </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.prev+'" value="'+res.prev+'"> Prev </a></li>\
+                                <li class="page-item active"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.page+'" value="'+res.page+'"> '+res.page+' </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.next+'" value="'+res.next+'"> Next </a></li>\
+                                <li class="page-item"><a class="page-link" href = "/users/submissions/'+user+'/submissions/'+res.last+'" value="'+res.last+'"> Last </a></li>\
+                            </ul>\
+                        ');
+                    }
+                }
+
+                $("#noss").html('');
+                $("#llasts").html('');
+                $("#lpages").html('');
+
+                $("#noss").append(res.nos);
+                $("#llasts").append(res.last);
+                $("#lpages").append(res.page);
+
+            }
+        })
+
+    });
+    
+    
+
+    
+
+</script>
