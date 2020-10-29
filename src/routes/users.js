@@ -591,20 +591,27 @@ router.route('/getleaderboard/:page')
 
         var userdata = [];
         for (let i = 0; i < userdata1.length; i++) {
-            var keys = Object.keys(userdata1[i].allrating);
-            if (keys.length !== 0) {
-                userdata.push(userdata1[i]);
+            if (userdata1[i]) {
+                if (userdata1[i].allrating) {
+                    var keys = Object.keys(userdata1[i].allrating);
+                    if (keys.length !== 0) {
+                        userdata.push(userdata1[i]);
+                    }
+                }
             }
 
         }
 
 
-        userdata.sort((a, b) => {
-            if (a['rating'] < b['rating']) return 1;
-            else if (a['rating'] > b['rating']) return -1;
-            else if (a['username'] > b['username']) return 1;
-            else return -1;
-        });
+        if(userdata.length>0){
+        
+            userdata.sort((a, b) => {
+                if (a['rating'] < b['rating']) return 1;
+                else if (a['rating'] > b['rating']) return -1;
+                else if (a['username'] > b['username']) return 1;
+                else return -1;
+            });
+        }
 
         var z = 1;
         var rankarray = [];
