@@ -117,7 +117,7 @@ router.route('/register')
                 result.value.password = hash;
                 // console.log('new vlaues - ', result.value);
 
-
+                const newuser = new User(result.value);
                 try {
                     var transporter = nodemailer.createTransport({
                         service: 'gmail',
@@ -145,7 +145,7 @@ router.route('/register')
                     return;
                 }
 
-                const newuser = new User(result.value);
+                
                 // console.log('newuser - ', newuser)
                 await newuser.save();
 
