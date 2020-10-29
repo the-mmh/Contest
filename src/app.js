@@ -89,9 +89,7 @@ app.use('/admin', require('./routes/admin'));
 const amqp = require('./services/recieveverdict');
 
 app.use((req, res, next) => {
-    req.flash('error', 'Page not found');
-    res.redirect('/');
-    
+    res.render('notfound');
 })
 
 const server = app.listen(process.env.PORT || 5000, () => {
