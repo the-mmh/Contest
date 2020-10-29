@@ -10,7 +10,11 @@ router.get('/', (req, res) => {
         password = req.user.password;
         email = req.user.email;
     }
-    res.render('index', { name: name, password: password, email: email });
+    res.render('index', {
+        name: name,
+        password: password,
+        email: email
+    });
 });
 
 

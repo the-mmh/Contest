@@ -86,9 +86,12 @@ app.use('/admin', require('./routes/admin'));
 
 
 
-
-// catch 404 and forward to error handler
 const amqp = require('./services/recieveverdict');
+
+app.use((req, res, next) => {
+    res.render('notfound');
+})
+
 const server = app.listen(process.env.PORT || 5000, () => {
     console.log('Server started on 5000!');
     amqp.recieveverdict();
