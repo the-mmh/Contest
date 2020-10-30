@@ -10,6 +10,7 @@ const Contest = require('../models/contest');
 const Ques = require('../models/ques');
 const randomstring = require('randomstring');
 const request = require('request');
+const emailExistence = require('email-existence');
 var nodemailer = require('nodemailer');
 var emailconname = "iiitbloog@gmail.com";
 var emailconpass = "Gaurav@63";
@@ -28,7 +29,7 @@ const userschema = joi.object().keys({
     confirmationPassword: joi.any().valid(joi.ref('password')).required(),
     flang: joi.string().required(),
     template: joi.string().required(),
-    mis: joi.string().required(),
+    mis: joi.string().regex(/^\d{9}$/).required(),
     contact: joi.string().required()
 });
 
@@ -82,11 +83,7 @@ router.route('/register')
                 }
 
             }
-            console.log('checkemail -- ', checkemail);
             if (checkemail === 'cse.iiitp.ac.in' || checkemail === 'ece.iiitp.ac.in' || checkemail === 'iiitp.ac.in') {
-
-
-
 
                 const user = await User.findOne({ 'email': result.value.email }, (err, res) => {
                     if (err) throw err;
@@ -118,39 +115,53 @@ router.route('/register')
                 // console.log('new vlaues - ', result.value);
                 const newuser = new User(result.value);
 
-                var transporter = nodemailer.createTransport({
-                    service: 'gmail',
-                    auth: {
-                        user: emailconname,
-                        pass: emailconpass
-                    }
-                });
-                var mailOptions = {
-                    from: emailconname,
-                    to: req.body.email,
-                    subject: 'Confirmation mail for Bit Legion',
-                    text: "Hello " + req.body.username + "\n Here is Secret token for confirmation gmail on IIITBLOOG: \n " + newuser.secretToken
-                };
-                await transporter.sendMail(mailOptions, function(error, info) {
-                    if (error) {
-                        console.log(error);
+                emailExistence.check(newuser.email, async function(error, response) {
+                    if (response === true) {
+
+                        var transporter = nodemailer.createTransport({
+                            service: 'gmail',
+                            auth: {
+                                user: emailconname,
+                                pass: emailconpass
+                            }
+                        });
+                        var mailOptions = {
+                            from: emailconname,
+                            to: req.body.email,
+                            subject: 'Confirmation mail for Bit Legion',
+                            text: "Hello " + req.body.username + "\n Here is Secret token for confirmation of gmail on BiT Legion: \n " + newuser.secretToken
+                        };
+                        transporter.sendMail(mailOptions, function(error, info) {
+
+                            if (error) {
+                                req.flash('error', 'Possibly Non-existing email');
+                                res.redirect('/users/register');
+
+                            }
+                            console.log('Email sent: ' + info.response);
+
+
+                        });
+                        await newuser.save();
+
+                        req.flash('success', 'successfully registered');
+                        request(userupdate);
+                        res.redirect('/users/verify');
                     } else {
-                        console.log('Email sent: ' + info.response);
+                        req.flash('error', 'Possibly email doesn"t exist');
+                        res.redirect('/users/register');
                     }
                 });
 
 
                 // console.log('newuser - ', newuser)
-                await newuser.save();
 
-                req.flash('success', 'successfully registered');
-                request(userupdate);
 
                 // if (result.value.role === "admin") {
                 //     res.redirect('/users/adminverify');
                 //     return;
                 // } else {
-                res.redirect('/users/verify');
+
                 // }
             } else {
                 req.flash('error', 'Register using IIITP provided email id');
@@ -187,30 +198,6 @@ router.route('/dashboard')
             admin = false;
         }
 
-        var allrating = await User.findOne({ 'username': req.user.username }, 'allrating');
-
-
-        var dates = Object.keys(allrating['allrating']);
-
-        dates.sort((a, b) => {
-            if (a < b) return 1;
-            else return 0;
-        });
-
-
-        var tosend = [];
-        allrating = allrating['allrating'];
-        for (let i = 0; i < Math.min(dates.length, 5); i++) {
-            tosend.push(allrating[dates[i]]);
-        }
-
-
-        var participation = false;
-
-        if (tosend.length > 0) {
-            participation = true;
-        }
-
         res.render('dashboard', {
             username: req.user.username,
             email: req.user.email,
@@ -219,9 +206,7 @@ router.route('/dashboard')
             flang: req.user.flang,
             code: req.user.template,
             crating: req.user.rating,
-            ratingdata: tosend,
-            mis: req.user.mis,
-            participation: participation
+            mis: req.user.mis
         });
     });
 
@@ -384,7 +369,7 @@ router.route('/report')
         });
         var mailOptions = {
             from: emailconname,
-            to: "sarthak.igupta7379@gmail.com",
+            to: "gouravlathwal63@gmail.com",
             subject: 'plag Report for Bit Legion',
             text: "Submission: " + req.body.suba + "\nMatched Submission: \n " + req.body.subb
         };
@@ -654,6 +639,43 @@ router.route('/getleaderboard/:page')
         })
 
     })
+
+router.route('/checksubmissions/:id')
+    .get(async(req, res) => {
+        var id = req.params.id;
+        var sub = await Submission.findOne({ "s_id": id });
+
+        if (!sub) {
+            res.send("false");
+        } else {
+            res.send("true");
+        }
+    });
+
+router.route('/performancetable/:user')
+    .get(async(req, res) => {
+        var user = req.params.user;
+        var allrating = await User.findOne({ 'username': user }, 'allrating');
+        var dates = Object.keys(allrating['allrating']);
+
+        dates.sort((a, b) => {
+            if (a < b) return 1;
+            else return 0;
+        });
+
+
+        var tosend = [];
+        allrating = allrating['allrating'];
+        for (let i = 0; i < Math.min(dates.length, 5); i++) {
+            tosend.push(allrating[dates[i]]);
+        }
+
+        res.send({
+            data: tosend
+        })
+
+    })
+
 
 
 module.exports = router, isAuthenticated, isNotAuthenticated;

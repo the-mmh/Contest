@@ -24,9 +24,8 @@ app.use(bodyParser.json());
 
 
 
-var contestSchema = new Contest;
+
 var allcontest;
-contestSchema.score = {};
 
 let probs = {};
 
@@ -40,13 +39,11 @@ router.route('/')
     .post(async(req, res) => {
         try {
             var obj = req.body;
-
+            var contestSchema;
             var contestname = Object.keys(obj)[0];
-            await Contest.find({ 'name': contestname }, (err, res) => {
-                if (err) throw err;
-                contestSchema = res[0];
-            })
-            res.redirect('/contests/quespage');
+            contestSchema = await Contest.findOne({ 'name': contestname });
+
+            res.redirect('/contests/contest/' + contestSchema.code + '/quespage');
         } catch (error) {
             req.flash('error', 'Some error occurred');
             res.redirect('/contests');
@@ -115,13 +112,13 @@ router.route('/contestdetails')
         }
     });
 
-router.route('/queslist')
+router.route('/queslist/:ccode')
 
 .get(async(req, res) => {
     var date;
-    var dur = contestSchema.duration;
+
     var pC = [],
-        ccode = contestSchema.code;
+        ccode = req.params.ccode;
 
     var data = await Contest.findOne({ 'code': ccode }, 'date duration problems');
     date = data.date.getTime();
@@ -189,38 +186,42 @@ router.route('/edittemp')
 // added close
 
 
-router.route('/quespage')
+router.route('/contest/:code/quespage')
 
 .get(async(req, res) => {
-    // try {
+    var code = req.params.code;
+
+    var data = await Contest.findOne({ 'code': code });
     if (req.user !== undefined) {
+
         res.render('quespage', {
-            CName: contestSchema.name,
-            CCode: contestSchema.code,
+            CName: data.name,
+            CCode: code,
             user: req.user.username
         });
     } else {
         res.render('quespage', {
-            CName: contestSchema.name,
-            CCode: contestSchema.code
+            CName: data.name,
+            CCode: code
         });
     }
 
 })
 
 
-router.route('/quespage/prob/:probCode')
+router.route('/contest/:code/quespage/prob/:probCode')
 
 .get(async(req, res) => {
 
     try {
 
         var final1 = {},
-            code = req.params.probCode;
+            code = req.params.probCode,
+            ccode = req.params.code;
         res.render('prob', {
 
-
-            CPCode: code,
+            CCode: ccode,
+            CPCode: code
 
         })
 
@@ -233,7 +234,8 @@ router.route('/quespage/prob/:probCode')
 
 .post(async(req, res, next) => {
     try {
-        res.redirect('/contests/submit/' + req.params.probCode);
+        var ccode = req.params.code;
+        res.redirect('/contests/contest/' + ccode + '/submit/' + req.params.probCode);
     } catch (error) {
         next(error);
     }
@@ -291,7 +293,7 @@ router.route('/getprobdetails/:probCode')
 
 
 
-router.route('/submit/:probCode')
+router.route('/contest/:code/submit/:probCode')
 
 .get((req, res) => {
     if (req.user === undefined) {
@@ -302,6 +304,7 @@ router.route('/submit/:probCode')
     if (req.user) {
 
         res.render('editor', {
+            CCode: req.params.code,
             who: req.user.username,
             which: req.params.probCode,
             flang: req.user.flang,
@@ -320,6 +323,8 @@ router.route('/submit/:probCode')
             res.redirect('/contests');
             return;
         }
+
+        var contestSchema = await Contest.findOne({ 'code': req.params.code });
 
         subdate = Date().split("GMT")[0];
         subdatestring = Date.now().toString();
@@ -354,19 +359,19 @@ router.route('/submit/:probCode')
 
         // console.log("sub -- ", sub);
 
-        await sub.save();
+
 
         var date, now = Date.now();
         var dur = contestSchema.duration;
-        var gett;
-        gett = await Contest.findOne({ 'code': contestSchema.code }, 'date duration');
+        var gett = contestSchema;
+
 
         date = gett.date.getTime();
         dur = gett.duration;
 
 
         if (now >= date && (date + (dur * 60 * 60 * 1000)) >= now) {
-
+            await sub.save();
             var lang = sub.language;
             var command;
             var ext;
@@ -426,13 +431,14 @@ router.route('/submit/:probCode')
             })
             res.redirect("/users/submissions/" + req.user.username + "/submissions/1");
         } else if ((date + (dur * 60 * 60 * 1000)) < now) {
-            res.redirect("/contests/quespage");
-            notifier.notify('Contest is ended');
             req.flash('error', "Contest is ended");
+            res.redirect("/contests/contest/" + req.params.code + "/quespage");
+
+
 
         } else {
             req.flash('error', "Contest is not yet started");
-            res.redirect("/contests/quespage");
+            res.redirect("/contests/contest/" + req.params.code + "/quespage");
 
         }
 
@@ -612,7 +618,10 @@ router.route('/ranklist/:code')
         if (req.user !== undefined) {
             user = req.user.username;
         }
-        res.render('ranklist', { ccode: req.params.code, user: user });
+        res.render('ranklist', {
+            ccode: req.params.code,
+            user: user
+        });
     });
 
 

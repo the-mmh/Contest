@@ -42,9 +42,13 @@
 	</div>
 
 <script>
-	$("#conCode").ready(function(){
+	$(document).ready(function(){
+		var path = window.location.pathname;
+		path = path.split('/');
+		var code = path[path.length - 2];
+		console.log(code);
 		$.ajax({
-            url: '/contests/queslist',
+            url: '/contests/queslist/'+code,
             success: function(res) {
 				console.log(res);
 				$('#pt').html('');
@@ -62,7 +66,7 @@
                 
 				var i=1;
                 res.CProblems.forEach((qu) => {
-                    x+=('<tr><td>'+i+'</td><td><a id="queslink" href="/contests/quespage/prob/'+qu[0]+'">'+qu[0]+'</a></td><td>'+qu[1]+'</td><td>'+qu[2]+'</td><td>'+qu[3]+'</td></tr>');
+                    x+=('<tr><td>'+i+'</td><td><a id="queslink" href="/contests/contest/'+code+'/quespage/prob/'+qu[0]+'">'+qu[0]+'</a></td><td>'+qu[1]+'</td><td>'+qu[2]+'</td><td>'+qu[3]+'</td></tr>');
 					i++;
                 });
 				if(res.CProblems.length>0){
@@ -71,7 +75,7 @@
 
 				$('#rank').html('');
 				if(res.CProblems.length>0){
-					$('#rank').append('<center><a id="ranklist" href = "/contests/ranklist/{{CCode}}">Ranklist</a></center>')
+					$('#rank').append('<center><a id="ranklist" href = "/contests/contest/'+code+'/ranklist/{{CCode}}">Ranklist</a></center>')
 				}
             }
         })

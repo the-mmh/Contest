@@ -47,15 +47,16 @@ table {
 }
 
 .servertime {
-    border-top: 3px solid rgb(212, 209, 223);
-    border-right: 3px solid rgb(212, 209, 223);
-    box-shadow: 0px 0px 10px grey;
+    border-top: 3px solid grey;
+    border-right: 3px solid grey;
+    box-shadow: 0px 0px 10px black;
     border-radius: 8px;
     bottom: 10;
     right: 10;
+    color: white;
     z-index: 99999;
     position: fixed;
-    background-color: rgb(168, 164, 187);
+    background-color: #343a40;
     padding: 10px;
     text-align: center;
 }
@@ -117,11 +118,12 @@ a.nav-link:hover:before {
     box-shadow: 0px 0px 10px grey;
     background: rgb(52, 58, 64) !important;
     transition: all 0.2s;
+    margin: 10px;
 }
 
 .card:hover {
     box-shadow: 0px 0px 7px #000;
-    margin: -10px;
+    margin: 5px;
 }
 
 .contest-page tr td {

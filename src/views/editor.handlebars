@@ -99,7 +99,8 @@ Code:
 <br /><br />
 <button class="btn btn-outline-success" id="tedit" onclick="editsave()" >Save as Template</button>
 <br /><br />
-<form action="/contests/submit/{{which}}" method="POST">
+
+<form action="/contests/contest/{{CCode}}/submit/{{which}}" method="POST">
 	<select class="selectpicker" data-live-search="true" class="form-control" name="Language" id="mode" onchange="changeMode()">
               <option value="C" id="C" selected>C</option>
               <option value="C++" id="C++">C++</option>

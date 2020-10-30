@@ -1,7 +1,7 @@
 <style type="text/css" media="screen">
     #editor { 
         
-        
+        height: 100px;
         overflow-y: scroll;
     }
 </style>
@@ -46,7 +46,7 @@ Code:
 <script>
     var editor = ace.edit("editor", {
         autoScrollEditorIntoView: true,
-        maxLines:500
+        maxLines:50
     });
     editor.renderer.setScrollMargin(10, 10, 10, 10);
     editor.setTheme("ace/theme/xcode");

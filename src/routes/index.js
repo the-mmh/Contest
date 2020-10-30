@@ -3,7 +3,7 @@ const router = express.Router();
 
 router.get('/', (req, res) => {
     var name = "";
-    var password = "";
+    var password = "xxxxxxxx";
     var email = "xxxxxxxx";
     if (req.user) {
         name = req.user.username;
