@@ -116,7 +116,8 @@ router.route('/register')
                 const newuser = new User(result.value);
 
                 emailExistence.check(newuser.email, async function(error, response) {
-                    if (response === true) {
+                    console.log(response);
+                    if (response == true) {
 
                         var transporter = nodemailer.createTransport({
                             service: 'gmail',
@@ -129,7 +130,7 @@ router.route('/register')
                             from: emailconname,
                             to: req.body.email,
                             subject: 'Confirmation mail for Bit Legion',
-                            text: "Hello " + req.body.username + "\n Here is Secret token for confirmation of gmail on BiT Legion: \n " + newuser.secretToken
+                            html: ' <div style="font-size:25px">Hello ' + newuser.username + '</div>\n <div style="font-size:25px"> Here is Secret token for confirmation of gmail on BiT Legion:<br> <b>' + newuser.secretToken + '</b></div>'
                         };
                         transporter.sendMail(mailOptions, function(error, info) {
 
@@ -360,6 +361,7 @@ router.route('/report')
         res.render("report");
     })
     .post(async(req, res) => {
+
         var transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -367,20 +369,23 @@ router.route('/report')
                 pass: emailconpass
             }
         });
+
         var mailOptions = {
             from: emailconname,
-            to: "gouravlathwal63@gmail.com",
+            to: "glathwal1@gmail.com",
             subject: 'plag Report for Bit Legion',
-            text: "Submission: " + req.body.suba + "\nMatched Submission: \n " + req.body.subb
+            text: "Number of Submissions: " + req.body.suba + "\nMatched Submissions: \n " + req.body.subb
         };
         await transporter.sendMail(mailOptions, function(error, info) {
             if (error) {
                 console.log(error);
             } else {
+
                 console.log('Email sent: ' + info.response);
             }
             0
         });
+        req.flash('success', 'Reported successfully');
         res.redirect("/");
     })
 

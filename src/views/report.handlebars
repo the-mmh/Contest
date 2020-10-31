@@ -1,13 +1,15 @@
 <form action="/users/report" method="POST">
-    <div class="form-group">
-  <label class="control-label" for="inputn">Submisson ID 1:</label>  
-  <input  class="form-control" type="text" id="inputn" name="suba" placeholder="Subbmission id" required>
-  </div>
+   
+  <input  class="form-control" hidden type="text" id="inputn" name="suba" value="0" placeholder="Subbmission id" >
+  
+  
   <div class="form-group">
   <label class="control-label" for="inputb">Submisson Ids:</label>  
-  <input  class="form-control" type="text" id="inputb" name="subb" placeholder="Subbmission ids" required>
+  <textarea  class="form-control" type="text" id="inputb" rows=15 name="subb" placeholder="Subbmission ids" required readonly="readonly"> 
+
+  </textarea>
   </div>
-  <div> Enter matched submission ids seperated by ","</div>
+ 
    <button class="btn btn-outline-secondary" type="submit">Report</button>
 
    
@@ -18,19 +20,48 @@
   <label class="control-label" for="checksub" >Check Submission existence:</label>  
   <input  class="form-control" type="text" id="checksub" name="sub" placeholder="Subbmission ids">
 </div>
+
 <div class="btn btn-primary" onclick="func()"> Check</div>
+<div class="btn btn-primary" onclick="func1()"> Check And Add</div>
 
 <script>
   var func = function(){ 
     
-    $("#substats").html('');
-    $("#substats").html("<img src='/roll.gif' width='50px' height='50px' />");
+    $("#substatus").html('');
+    $("#substatus").append("<img src='/roll.gif' width='100px' height='100px' />");
     var x=document.getElementById("checksub").value;
     $.get("/users/checksubmissions/"+x, function(data, status) {
       if(data=="true"){
         $("#substats").html('');
         document.getElementById("substatus").innerHTML="<h3> Subbmission exists</h3>";
         document.getElementById("substatus").style.color = "green";
+      }else{
+          document.getElementById("substatus").innerHTML="<h3> Subbmission doesn't exist</h3>";
+        document.getElementById("substatus").style.color = "red";
+      }
+      console.log("Data: " + data + "\nStatus: " + status);
+      
+    });
+  }
+   var func1 = function(){ 
+    
+    $("#substatus").html('');
+    $("#substatus").append("<img src='/roll.gif' width='100px' height='100px' />");
+    var x=document.getElementById("checksub").value;
+    $.get("/users/checksubmissions/"+x, function(data, status) {
+      if(data=="true"){
+        $("#substats").html('');
+        var z= (parseInt(document.getElementById("inputn").value)+1).toString();
+        document.getElementById("substatus").innerHTML="<h3> Subbmission exists</h3>";
+        document.getElementById("substatus").style.color = "green";
+        var y=document.getElementById("inputb").value;
+        
+        if(z=='11'){
+          alert("You can report 10 solution At a time!");
+          return;
+        }
+        document.getElementById("inputb").value=y+'\n '+z+". "+x;
+        document.getElementById("inputn").value=z; 
       }else{
           document.getElementById("substatus").innerHTML="<h3> Subbmission doesn't exist</h3>";
         document.getElementById("substatus").style.color = "red";

@@ -47,75 +47,80 @@
                 if(res.cuser.length){
                     $('#cuser').append('<b>'+res.cuser[0]+'</b>: '+res.cuser[1]);
                 }
-                var prob = "", data = "";
-                res.pC.forEach((qu) => {
-                    prob+=('<th><button id="'+qu+'">'+qu+'</button></th>');
-                    keys.push(qu);
-                    
-                })
-            
-
-				$('#ranktable').html('');
-                $('#ranktable').append('<table style = "width:80%">\
-                    <tr>\
-                        <th><button id="rank" type="submit" value="rank" name ="rank">Rank</button></th>\
-                        <th><button id="username">Username</button></th>\
-                        <th><button id="score">Score</button></th>\
-                        <th><button id="penalty">Penalty</button></th>'
-                        +
-                        prob
-                        +
-                        '</tr>'+
-                    res.det
-                    +
-                    '</table>'
-                );
-
-                console.log(keys);
-                keys.forEach((key) => {
-                
-                    
-                    $('body').on('click', `#${key}`, ()=>{
-                    
-                        $.ajax({
-
-                            url: '/contests/getranklist/{{ccode}}?sortby='+key,
-                            success: function(res) {
-                                res.cuser = res.cuser || [];
-                                console.log(res);
-                                $('#cuser').html('');
-                                if(res.cuser.length){
-                                    $('#cuser').append('<b>'+res.cuser[0]+'</b>: '+res.cuser[1]);
-                                }
-                                var prob = "", data = "";
-                                res.pC.forEach((qu) => {
-                                    prob+=('<th><button id="'+qu+'">'+qu+'</button></th>');
-                                    
-                                })
-                            
-
-                                $('#ranktable').html('');
-                                $('#ranktable').append('<table border="2px solid black" style = "width:80%">\
-                                        <tr>\
-                                            <th><button id="rank" type="submit" value="rank" name ="rank">Rank</button></th>\
-                                            <th><button id="username">Username</button></th>\
-                                            <th><button id="score">Score</button></th>\
-                                            <th><button id="penalty">Penalty</button></th>'
-                                            +
-                                            prob
-                                            +
-                                            '</tr>'+
-                                        res.det
-                                        +
-                                        '</table>');
-                                
-                            }
-                        })
-
-
+                if(res.participation === true){
+                    var prob = "", data = "";
+                    res.pC.forEach((qu) => {
+                        prob+=('<th><button id="'+qu+'">'+qu+'</button></th>');
+                        keys.push(qu);
+                        
                     })
-                })
                 
+
+                    $('#ranktable').html('');
+                    $('#ranktable').append('<table style = "width:80%">\
+                        <tr>\
+                            <th><button id="rank" type="submit" value="rank" name ="rank">Rank</button></th>\
+                            <th><button id="username">Username</button></th>\
+                            <th><button id="score">Score</button></th>\
+                            <th><button id="penalty">Penalty</button></th>'
+                            +
+                            prob
+                            +
+                            '</tr>'+
+                        res.det
+                        +
+                        '</table>'
+                    );
+
+                    console.log(keys);
+                    keys.forEach((key) => {
+                    
+                        
+                        $('body').on('click', `#${key}`, ()=>{
+                        
+                            $.ajax({
+
+                                url: '/contests/getranklist/{{ccode}}?sortby='+key,
+                                success: function(res) {
+                                    res.cuser = res.cuser || [];
+                                    console.log(res);
+                                    $('#cuser').html('');
+                                    if(res.cuser.length){
+                                        $('#cuser').append('<b>'+res.cuser[0]+'</b>: '+res.cuser[1]);
+                                    }
+                                    var prob = "", data = "";
+                                    res.pC.forEach((qu) => {
+                                        prob+=('<th><button id="'+qu+'">'+qu+'</button></th>');
+                                        
+                                    })
+                                
+
+                                    $('#ranktable').html('');
+                                    $('#ranktable').append('<table border="2px solid black" style = "width:80%">\
+                                            <tr>\
+                                                <th><button id="rank" type="submit" value="rank" name ="rank">Rank</button></th>\
+                                                <th><button id="username">Username</button></th>\
+                                                <th><button id="score">Score</button></th>\
+                                                <th><button id="penalty">Penalty</button></th>'
+                                                +
+                                                prob
+                                                +
+                                                '</tr>'+
+                                            res.det
+                                            +
+                                            '</table>');
+                                    
+                                }
+                            })
+
+
+                        })
+                    })
+                    
+                } else {
+                    $('#ranktable').html('');
+                    $('#ranktable').append('No Participation');
+                }
                 
                 
             }

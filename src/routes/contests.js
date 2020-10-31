@@ -718,6 +718,8 @@ router.route('/getranklist/:code')
 
     var show = {};
 
+    participation = true;
+
 
     if (scores.length > 0) {
 
@@ -767,44 +769,54 @@ router.route('/getranklist/:code')
             show[scores[i]["username"]]["rank"] = scores[i]["rank"];
 
         }
+        var users = Object.keys(show),
+            data = "";
 
-    }
+        for (let i = 0; i < users.length; i++) {
+            var k = users[i];
+            data += '<tr>';
 
+            data += '<td>' + show[k]['rank'] + '</td>';
 
+            data += '<td><a href="/users/user/' + k + '">' + k + '</a></td>';
+            data += '<td>' + (show[k].score || 0).toString() + '</td>';
+            data += '<td>' + (show[k].penalty || 0).toString() + '</td>';
 
+            pC.forEach((key) => {
+                data += '<td>' + (show[k]['problem'][key]['score'] || 0).toString() + "-" + (show[k]['problem'][key]['p'] || 0).toString() + '</td>';
+            });
+            data += '</tr>';
+        }
 
-    var users = Object.keys(show),
-        data = "";
+        // console.log(show);
 
-    for (let i = 0; i < users.length; i++) {
-        var k = users[i];
-        data += '<tr>';
-
-        data += '<td>' + show[k]['rank'] + '</td>';
-
-        data += '<td><a href="/users/user/' + k + '">' + k + '</a></td>';
-        data += '<td>' + (show[k].score || 0).toString() + '</td>';
-        data += '<td>' + (show[k].penalty || 0).toString() + '</td>';
-
-        pC.forEach((key) => {
-            data += '<td>' + (show[k]['problem'][key]['score'] || 0).toString() + "-" + (show[k]['problem'][key]['p'] || 0).toString() + '</td>';
-        });
-        data += '</tr>';
-    }
-
-    // console.log(show);
-
-    res.send({
+        res.send({
             pC: pC,
             data: show,
             cuser: currentuser,
-            det: data
+            det: data,
+            participation: true,
         })
-        // }
-        //  catch (error) {
-        //     req.flash('error', 'Some error occurred');
-        //     res.redirect('/contests');
-        // }
+
+    } else {
+        res.send({
+            pC: pC,
+            data: show,
+            cuser: currentuser,
+            det: data,
+            participation: false,
+        })
+    }
+
+
+
+
+
+    // }
+    //  catch (error) {
+    //     req.flash('error', 'Some error occurred');
+    //     res.redirect('/contests');
+    // }
 });
 
 

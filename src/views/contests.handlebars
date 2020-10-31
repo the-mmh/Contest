@@ -57,11 +57,14 @@
                 var cudt = res.CUDate || [];
                 var cedt = res.CPDate || [];
 
+                
+
 				cr.html('');
                 cu.html('');
                 cp.html('');
                 
                 if(crc.length>0){
+                    
                     var x = '';    
                     for(let i=0;i<crc.length;i++){
                         var date = crdt[i].split('T')[0];
@@ -78,8 +81,8 @@
                 if(cuc.length>0){
                     var x = '';    
                     for(let i=0;i<cuc.length;i++){
-                        var date = crdt[i].split('T')[0];
-                        var time = crdt[i].split('T')[1].split('.')[0];
+                        var date = cudt[i].split('T')[0];
+                        var time = cudt[i].split('T')[1].split('.')[0];
                         
                         x+=('<tr><td class="text-center" width="10%">'+Number(i+1)+'</td><td class="text-center" width="40%"><button type="submit" name = "'+cuc[i]+'" value = "'+cuc[i]+'">'+cuc[i]+'</button></td><td>'+cud[i]+'</td><td>'+date+'<br />'+time+'</td><td class="text-center" width="20%">Upcoming</td></tr>');
                     }
@@ -92,8 +95,8 @@
                     var x = '';    
                     for(let i=0;i<cpc.length;i++){
                         
-                        var date = crdt[i].split('T')[0];
-                        var time = crdt[i].split('T')[1].split('.')[0];
+                        var date = cedt[i].split('T')[0];
+                        var time = cedt[i].split('T')[1].split('.')[0];
                         x+=('<tr><td class="text-center" width="10%">'+Number(i+1)+'</td><td class="text-center" width="40%"><button type="submit" name = "'+cpc[i]+'" value = "'+cpc[i]+'">'+cpc[i]+'</button></td><td>'+ced[i]+'</td><td>'+date+'<br />'+time+'</td><td class="text-center" width="20%">Ended</td></tr>');
                     }
                     cp.append('<table class="contest-page" width="100%" border="1px solid black"><tr><th class="text-center" width="10%">S. No.</th><th class="text-center" class="text-center" width="40%">Name</th><th width="10%">Duration</th><th>Date</th><th class="text-center" width="20%">Status</th></tr>' + x + '</table>');
