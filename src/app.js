@@ -89,7 +89,7 @@ app.use('/admin', require('./routes/admin'));
 const amqp = require('./services/recieveverdict');
 
 app.use((req, res, next) => {
-    res.render('notfound');
+    res.render('notFound');
 })
 
 const server = app.listen(process.env.PORT || 5000, () => {
